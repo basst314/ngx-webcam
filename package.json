@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/basst314/ngx-webcam.git"
   },
+  "keywords": [
+    "Webcam", "Camera", "Angular", "Angular 4", "Angular 5", "Smartphone"
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve --preserve-symlinks",
