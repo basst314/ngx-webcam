@@ -1,7 +1,12 @@
 {
   "name": "ngx-webcam",
   "version": "0.0.1",
+  "author": "basst314",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/basst314/ngx-webcam.git"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve --preserve-symlinks",
