@@ -1,6 +1,6 @@
 {
   "name": "ngx-webcam",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "basst314",
   "license": "MIT",
   "repository": {
@@ -8,7 +8,12 @@
     "url": "https://github.com/basst314/ngx-webcam.git"
   },
   "keywords": [
-    "Webcam", "Camera", "Angular", "Angular 4", "Angular 5", "Smartphone"
+    "Webcam",
+    "Camera",
+    "Angular",
+    "Angular 4",
+    "Angular 5",
+    "Smartphone"
   ],
   "scripts": {
     "ng": "ng",
