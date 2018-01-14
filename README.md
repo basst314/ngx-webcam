@@ -18,6 +18,7 @@ Try out the online <a href="https://basst314.github.io/ngx-webcam/?" target="_bl
 * Photo capturing
 * Smartphone compatibility for modern OS's (OS must support WebRTC/UserMedia access)
 * Access to front- and back-camera, if multiple cameras exist (feature in progress)
+* Portrait & Landscape mode on smartphones
 
 More features coming soon.
 
