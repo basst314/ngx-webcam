@@ -1,9 +1,9 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {TestHeaderComponent} from './test-header/test-header.component';
+import {WebcamComponent} from './webcam/webcam.component';
 
 const COMPONENTS = [
-  TestHeaderComponent
+  WebcamComponent
 ];
 
 @NgModule({
@@ -17,5 +17,5 @@ const COMPONENTS = [
     COMPONENTS
   ]
 })
-export class HeaderModule {
+export class WebcamModule {
 }
