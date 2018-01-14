@@ -15,7 +15,7 @@ Try out the online <a href="https://basst314.github.io/ngx-webcam/?" target="_bl
 
 ## Features
 * Webcam live view
-* Photo capturing (Feature in progress)
+* Photo capturing
 * Smartphone compatibility (OS must support WebRTC/UserMedia access, like it does on iOS 11.x and Android ??)
 * Access to front- and back-camera, if multiple cameras exist (Feature in progress)
 
