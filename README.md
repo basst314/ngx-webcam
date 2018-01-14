@@ -1,18 +1,24 @@
-# NgxWebcam
-Angular 4+ Webcam-Component / pure &amp; minimal, no Flash-Fallback.
+<img src="https://img.shields.io/badge/Development-In%20Progress-orange.svg" /> This project is currently under development and **cannot** be used yet. This banner will be removed as soon as possible. Please show your interest in this project by starring it.
 
-## Build
+
+# Ngx-Webcam
+A simple Angular 4+ Webcam-Component - pure &amp; minimal, no Flash-Fallback.
+
+If you're looking for a simple to use, minimized version of an Angular webcam-component, this library is just right for you.
+
+**Plug-and-play.** This library contains a single webcam-module which can be imported into nearly every existing Angular 4+ project.
+
+**Simple to use.** One component gives you full control over the your webcam and lets you take screenshots via actions / event bindings.
+
+**Minimal.** No unnecessary Flash-fallbacks, no bundle-size bloating.
+
+
+## Development
+Here you can find instructions on how to start developing this library.
+
+### Build
 
 Run `npm run packagr` to build the library. The build artifacts will be stored in the `dist/` directory.
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+### Running Unit Tests
+Will follow soon.
