@@ -12,6 +12,44 @@ If you're looking for a simple to use, minimized version of an Angular webcam-co
 
 **Minimal.** No unnecessary Flash-fallbacks, no bundle-size bloating.
 
+## Prerequisites
+Runtime Dependencies:
+* Angular 2.x, 4.x or 5.x 
+* RxJs (Observables, Subjects)
+
+Client:
+* Current Browser w/ HTML5 support (Chrome, Safari, Firefox, Edge, IE)
+* Webcam :)
+* User permissions to access the webcam
+
+## Usage
+1) Install the library via standard npm command:
+
+`npm install --save ngx-webcam`
+
+2) Import the `WebcamModule` into your Angular module:
+
+```
+import {WebcamModule} from 'ngx-webcam';
+
+@NgModule({
+  imports: [
+    WebcamModule
+    ...
+  ],
+  ...
+})
+export class AppModule { }
+```
+
+3) Use the `WebcamComponent` on your pages:
+
+`<webcam></webcam>`
+
+As simple as that.
+
+## Options and Events
+Find options and events here soon... // development in progress
 
 ## Development
 Here you can find instructions on how to start developing this library.
