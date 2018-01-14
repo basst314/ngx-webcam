@@ -1,4 +1,4 @@
-<div class="webcam-wrapper">
+<div class="webcam-wrapper" (click)="imageClick.next();">
   <video #video [width]="width" [height]="height" autoplay muted playsinline></video>
   <canvas #canvas [width]="width" [height]="height"></canvas>
 </div>
