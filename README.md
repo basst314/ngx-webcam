@@ -1,16 +1,17 @@
-<img src="https://img.shields.io/badge/Development-In%20Progress-orange.svg" /> This project is currently under development and **cannot** be used yet. This banner will be removed as soon as possible. Please show your interest in this project by starring it.
+<img src="https://img.shields.io/badge/Development-In%20Progress-orange.svg" /> This project is currently under heavy development and is still in a pre-release phase. Please show your interest in this project by starring it.
 
 
 # Ngx-Webcam
-A simple Angular 4+ Webcam-Component - pure &amp; minimal, no Flash-Fallback.
-
-If you're looking for a simple to use, minimized version of an Angular webcam-component, this library is just right for you.
+A simple Angular 4+ Webcam-Component - pure &amp; minimal, no Flash-Fallback. [Demo](https://basst314.github.io/ngx-webcam/?)
 
 **Plug-and-play.** This library contains a single webcam-module which can be imported into nearly every existing Angular 4+ project.
 
 **Simple to use.** One component gives you full control over the your webcam and lets you take screenshots via actions / event bindings.
 
 **Minimal.** No unnecessary Flash-fallbacks, no bundle-size bloating.
+
+## Demo
+Try out the online [Demo](https://basst314.github.io/ngx-webcam/?)
 
 ## Prerequisites
 Runtime Dependencies:
