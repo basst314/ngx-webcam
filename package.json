@@ -17,12 +17,13 @@
   ],
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --preserve-symlinks",
-    "build": "ng build --prod --preserve-symlinks",
-    "test": "ng test --preserve-symlinks",
+    "start": "ng serve",
+    "build": "ng build --prod",
+    "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "packagr": "ng-packagr -p ng-package.json"
+    "packagr": "ng-packagr -p ng-package.json",
+    "docs": "npm run build -- --base-href /ngx-webcam/ --op docs"
   },
   "private": false,
   "dependencies": {
