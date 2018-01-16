@@ -1,8 +1,7 @@
-<img src="https://img.shields.io/badge/Development-In%20Progress-orange.svg" /> This project is currently under heavy development and is still in a pre-release phase. Please show your interest in this project by starring it.
-
-
 # Ngx-Webcam
-A simple Angular 4+ Webcam-Component - pure &amp; minimal, no Flash-Fallback. <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Demo</a>
+A simple Angular 4+ Webcam-Component - pure &amp; minimal, no Flash-Fallback. <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">See the Demo!</a>
+
+<img src="https://img.shields.io/badge/Development-In%20Progress-orange.svg" /> This project is currently under heavy development and is still in a pre-release phase. Please show your interest by starring it.
 
 **Plug-and-play.** This library contains a single webcam-module which can be imported into nearly every Angular 4+ project.
 
