@@ -10,7 +10,7 @@ A simple Angular 4+ Webcam-Component. Pure &amp; minimal, no Flash-Fallback. <a 
 **Minimal.** No unnecessary Flash-fallbacks, no bundle-size bloating.
 
 ## Demo
-Try out the online <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Demo</a>.
+Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Live-Demo</a> or see the <a href="https://github.com/basst314/ngx-webcam-demo" target="_blank">Demo-Project</a>.
 
 ## Features
 * Webcam live view
