@@ -58,7 +58,14 @@ export class AppModule { }
 As simple as that.
 
 ## Options and Events
-Find options and events here soon... // development in progress
+This section describes the basic Inputs/Outputs of the component.
+### Inputs
+* `trigger: Observable<void>`: An `Observable` to trigger image capturing. When it fires, an image will be captured and emitted (see Outputs).
+
+### Outputs
+* `imageCapture: EventEmitter<WebcamImage>`: Whenever an image is captured (e.g. triggered by `[trigger]`), the image is emitted via this `EventEmitter`. The image data is contained in the `WebcamImage` data structure.
+* `imageClick: EventEmitter<void>`: An `EventEmitter` to signal clicks on the webcam area.
+* `initError: EventEmitter<WebcamInitError>`: An `EventEmitter` to signal errors during the webcam initialization.
 
 ## Development
 Here you can find instructions on how to start developing this library.

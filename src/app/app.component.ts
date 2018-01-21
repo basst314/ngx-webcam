@@ -9,8 +9,6 @@ import {WebcamImage} from "./modules/webcam/domain/webcam-image";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  public title = 'app';
-
   // webcam snapshot trigger
   private trigger: Subject<void> = new Subject<void>();
 
