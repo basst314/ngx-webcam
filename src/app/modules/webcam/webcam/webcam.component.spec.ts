@@ -22,4 +22,12 @@ describe('WebcamComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  it('should render a video tag', async(() => {
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('video')).toBeTruthy();
+  }));
+  it('should render a canvas tag', async(() => {
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('canvas')).toBeTruthy();
+  }));
 });
