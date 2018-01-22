@@ -74,8 +74,8 @@ Run `npm run packagr` to build the library. The build artifacts will be stored i
 ### Start
 Run `npm start` to build and run the surrounding webapp with the `WebcamModule`. Essential for live-developing.
 
-### Generate /docs
-Run `npm run docs` to generate the live-demo documentation pages in the `/docs` directory.
+### Generate docs/
+Run `npm run docs` to generate the live-demo documentation pages in the `docs/` directory.
 
 ### Running Unit Tests
 Run `npm run test` to run unit-tests.
