@@ -69,8 +69,13 @@ This section describes the basic Inputs/Outputs of the component.
 Here you can find instructions on how to start developing this library.
 
 ### Build
-
 Run `npm run packagr` to build the library. The build artifacts will be stored in the `dist/` directory.
 
+### Start
+Run `npm start` to build and run the surrounding webapp with the `WebcamModule`. Essential for live-developing.
+
+### Generate /docs
+Run `npm run docs` to generate the live-demo documentation pages in the `/docs` directory.
+
 ### Running Unit Tests
-Will follow soon.
+Run `npm run test` to run unit-tests.
