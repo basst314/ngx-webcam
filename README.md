@@ -25,7 +25,7 @@ Runtime Dependencies:
 * RxJs (Observables, Subjects)
 
 Client:
-* Current Browser w/ HTML5 and WebRTC/UserMedia support (Chrome >53, Safari >11, Firefox >38, Edge)
+* [Current Browser](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Browser_compatibility) w/ HTML5 and WebRTC/UserMedia support (Chrome >53, Safari >11, Firefox >38, Edge)
 * Webcam :)
 * User permissions to access the webcam
 
