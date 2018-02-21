@@ -3,7 +3,7 @@ A simple Angular 4+ Webcam-Component. Pure &amp; minimal, no Flash-Fallback. <a 
 
 **Plug-and-play.** This library contains a single webcam-module which can be imported into nearly every Angular 4+ project.
 
-**Simple to use.** The one component gives you full control and lets you take screenshots via actions and event bindings.
+**Simple to use.** The one component gives you full control and lets you take snapshots via actions and event bindings.
 
 **Minimal.** No unnecessary Flash-fallbacks, no bundle-size bloating.
 
