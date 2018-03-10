@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {Subject} from "rxjs/Subject";
-import {Observable} from "rxjs/Observable";
+import {Subject} from 'rxjs/Subject';
+import {Observable} from 'rxjs/Observable';
 import {WebcamImage} from "./modules/webcam/domain/webcam-image";
 
 @Component({
@@ -9,14 +9,21 @@ import {WebcamImage} from "./modules/webcam/domain/webcam-image";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  // webcam snapshot trigger
-  private trigger: Subject<void> = new Subject<void>();
+  // toggle webcam on/off
+  public showWebcam = true;
 
   // latest snapshot
   public webcamImage: WebcamImage = null;
 
+  // webcam snapshot trigger
+  private trigger: Subject<void> = new Subject<void>();
+
   public triggerSnapshot(): void {
     this.trigger.next();
+  }
+
+  public toggleWebcam(): void {
+    this.showWebcam = !this.showWebcam;
   }
 
   public handleImage(webcamImage: WebcamImage): void {
