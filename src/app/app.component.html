@@ -4,9 +4,10 @@
   </h1>
 
   <div>
-    <webcam [trigger]="triggerObservable" (imageCapture)="handleImage($event)"></webcam>
+    <webcam [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"></webcam>
     <br/>
-    <button id="snapshotBtn" (click)="triggerSnapshot();">Take A Snapshot</button>
+    <button class="actionBtn" (click)="triggerSnapshot();">Take A Snapshot</button>
+    <button class="actionBtn" (click)="toggleWebcam();">Toggle Webcam</button>
   </div>
 </div>
 

@@ -19,6 +19,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private _trigger: Observable<void>;
   private triggerSubscription: Subscription;
 
+  /** MediaStream object in use for streaming UserMedia data */
+  private mediaStream: MediaStream = null;
+
   /** EventEmitter which fires when an image has been captured */
   @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
   /** Emits a mediaError if webcam cannot be initialized (e.g. missing user permissions) */
@@ -37,6 +40,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.stopMediaTracks();
     this.unsubscribeFromSubscriptions();
   }
 
@@ -90,8 +94,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     let _video = this.video.nativeElement;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       // TODO allow video options as Input()
-      navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
-        .then(stream => {
+      navigator.mediaDevices.getUserMedia(<MediaStreamConstraints>{video: {facingMode: "environment"}})
+        .then((stream: MediaStream) => {
+          this.mediaStream = stream;
           _video.srcObject = stream;
           _video.play();
         })
@@ -101,6 +106,19 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
         });
     } else {
       this.initError.next(<WebcamInitError> {message: "Cannot read UserMedia from MediaDevices."});
+    }
+  }
+
+  /**
+   * Stops all active media tracks.
+   * This prevents the webcam from being indicated as active,
+   * even if it is no longer used by this component.
+   */
+  private stopMediaTracks() {
+    if (this.mediaStream && this.mediaStream.getTracks) {
+      // getTracks() returns all media tracks (video+audio)
+      this.mediaStream.getTracks()
+        .forEach((track: MediaStreamTrack) => track.stop());
     }
   }
 
