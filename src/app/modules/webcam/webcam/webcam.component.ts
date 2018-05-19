@@ -1,8 +1,7 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
 import {WebcamInitError} from "../domain/webcam-init-error";
 import {WebcamImage} from "../domain/webcam-image";
-import {Observable} from "rxjs/Observable";
-import {Subscription} from "rxjs/Subscription";
+import {Observable, Subscription} from "rxjs";
 
 @Component({
   selector: 'webcam',

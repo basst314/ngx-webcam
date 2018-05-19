@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
-import {Subject} from 'rxjs/Subject';
-import {Observable} from 'rxjs/Observable';
+import {Subject, Observable} from 'rxjs';
 import {WebcamImage} from "./modules/webcam/domain/webcam-image";
 
 @Component({
