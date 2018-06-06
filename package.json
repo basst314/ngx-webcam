@@ -27,7 +27,8 @@
   },
   "private": false,
   "peerDependencies": {
-    "@angular/core": "^4 || ^5 || ^6"
+    "@angular/core": "^4.0.0 || ^5.0.0 || ^6.0.0",
+    "rxjs": "^5.0.0 || ^6.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.3",
