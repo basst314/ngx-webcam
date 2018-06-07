@@ -21,8 +21,8 @@ More features coming soon.
 
 ## Prerequisites
 Runtime Dependencies:
-* Angular 2.x, 4.x or 5.x 
-* RxJs (Observables, Subjects)
+* Angular: `^4.0.0 || ^5.0.0 || ^6.0.0`
+* RxJs: `^5.0.0 || ^6.0.0`
 
 Client:
 * [Current Browser](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Browser_compatibility) w/ HTML5 and WebRTC/UserMedia support (Chrome >53, Safari >11, Firefox >38, Edge)
