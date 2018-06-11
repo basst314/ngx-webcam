@@ -14,10 +14,9 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 * Webcam live view
 * Photo capturing
 * Smartphone compatibility for modern OS's (OS must support WebRTC/UserMedia access)
-* Access to front- and back-camera, if multiple cameras exist (feature in progress)
+* Access to front- and back-camera, if multiple cameras exist
 * Portrait & Landscape mode on smartphones
 
-More features coming soon.
 
 ## Prerequisites
 Runtime Dependencies:
@@ -59,11 +58,17 @@ As simple as that.
 This section describes the basic Inputs/Outputs of the component.
 ### Inputs
 * `trigger: Observable<void>`: An `Observable` to trigger image capturing. When it fires, an image will be captured and emitted (see Outputs).
+* `width: number`: The maximal video width of the webcam live view
+* `height: number`: The maximal video height of the webcam live view
+* `videoOptions: MediaTrackConstraints`: Defines base constraints to apply when requesting video track from UserMedia
+* `allowCameraSwitch: boolean`: Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras were found
+* `switchCamera: Observable<boolean|string>`: Can be used to cycle through available cameras (true=forward, false=backwards), or to switch to a specific device by deviceId (string).
 
 ### Outputs
 * `imageCapture: EventEmitter<WebcamImage>`: Whenever an image is captured (e.g. triggered by `[trigger]`), the image is emitted via this `EventEmitter`. The image data is contained in the `WebcamImage` data structure.
 * `imageClick: EventEmitter<void>`: An `EventEmitter` to signal clicks on the webcam area.
 * `initError: EventEmitter<WebcamInitError>`: An `EventEmitter` to signal errors during the webcam initialization.
+* `cameraSwitched: EventEmitter<string>`: Emits the active deviceId after the active video device was switched
 
 ## Development
 Here you can find instructions on how to start developing this library.
