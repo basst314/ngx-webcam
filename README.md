@@ -52,7 +52,9 @@ export class AppModule { }
 
 `<webcam></webcam>`
 
-As simple as that.
+As simple as that. 
+
+For more examples, see the code in the <a href="https://github.com/basst314/ngx-webcam-demo" target="_blank">Demo-Project</a>.
 
 ## Options and Events
 This section describes the basic Inputs/Outputs of the component.
