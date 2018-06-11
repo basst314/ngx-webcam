@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {WebcamImage} from "./modules/webcam/domain/webcam-image";
 import {WebcamUtil} from "./modules/webcam/util/webcam.util";
+import {WebcamInitError} from "./modules/webcam/domain/webcam-init-error";
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ export class AppComponent implements OnInit {
     width: {ideal: 1024},
     height: {ideal: 576}
   };
+  public errors: WebcamInitError[] = [];
 
   // latest snapshot
   public webcamImage: WebcamImage = null;
@@ -40,6 +42,10 @@ export class AppComponent implements OnInit {
 
   public toggleWebcam(): void {
     this.showWebcam = !this.showWebcam;
+  }
+
+  public handleInitError(error: WebcamInitError): void {
+    this.errors.push(error);
   }
 
   public showNextWebcam(directionOrDeviceId: boolean|string): void {
