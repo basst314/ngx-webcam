@@ -14,7 +14,7 @@ export class WebcamUtil {
         .then((devices: MediaDeviceInfo[]) => {
           resolve(devices.filter((device: MediaDeviceInfo) => device.kind === 'videoinput'));
         })
-        .catch(function (err) {
+        .catch(err => {
           reject(err.message || err);
         });
     });

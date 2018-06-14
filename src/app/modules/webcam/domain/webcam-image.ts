@@ -26,7 +26,7 @@ export class WebcamImage {
    * @returns {string} the dataUrl of the image
    */
   public get imageAsDataUrl(): string {
-    return this._imageAsDataUrl
+    return this._imageAsDataUrl;
   }
 
   /**
@@ -34,6 +34,6 @@ export class WebcamImage {
    * @param {string} dataUrl the given dataUrl
    */
   private getDataFromDataUrl(dataUrl: string) {
-    return dataUrl.replace("data:" + this._mimeType + ";base64,", "")
+    return dataUrl.replace("data:" + this._mimeType + ";base64,", "");
   }
 }
