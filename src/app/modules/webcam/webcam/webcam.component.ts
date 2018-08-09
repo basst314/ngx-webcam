@@ -167,13 +167,35 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   }
 
   public get videoWidth() {
-    let videoRatio = this.activeVideoSettings ? this.activeVideoSettings.aspectRatio : (this.width / this.height);
+    let videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
     return Math.min(this.width, this.height * videoRatio);
   }
 
   public get videoHeight() {
-    let videoRatio = this.activeVideoSettings ? this.activeVideoSettings.aspectRatio : (this.width / this.height);
+    let videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
     return Math.min(this.height, this.width / videoRatio);
+  }
+
+  /**
+   * Return the video aspect ratio from the given mediaTrackSettings, if possible;
+   * Otherwise, calculate given the width/height parameters only
+   * @param {MediaTrackSettings} mediaTrackSettings
+   */
+  private getVideoAspectRatio(mediaTrackSettings: MediaTrackSettings) {
+    if (mediaTrackSettings) {
+      if (mediaTrackSettings.aspectRatio) {
+        // if ratio is present - use it
+        return mediaTrackSettings.aspectRatio;
+
+      } else if (mediaTrackSettings.width && mediaTrackSettings.width > 0 &&
+        mediaTrackSettings.height && mediaTrackSettings.height > 0) {
+        // if width+height are present - calculate ratio
+        return mediaTrackSettings.width / mediaTrackSettings.height;
+      }
+    }
+
+    // nothing present in mediaTrackSettings - calculate ratio based on width/height params
+    return this.width / this.height;
   }
 
   /**
