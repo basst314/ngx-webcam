@@ -13,7 +13,7 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 ## Features
 * Webcam live view
 * Photo capturing
-* Smartphone compatibility for modern OS's (OS must support WebRTC/UserMedia access)
+* Smartphone compatibility for modern OS's (OS must support WebRTC/UserMedia API)
 * Access to front- and back-camera, if multiple cameras exist
 * Portrait & Landscape mode on smartphones
 
@@ -22,6 +22,7 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 Runtime Dependencies:
 * Angular: `^4.0.0 || ^5.0.0 || ^6.0.0`
 * RxJs: `^5.0.0 || ^6.0.0`
+* App must be served on secure context (https or localhost)
 
 Client:
 * [Current Browser](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Browser_compatibility) w/ HTML5 and WebRTC/UserMedia support (Chrome >53, Safari >11, Firefox >38, Edge)
@@ -61,16 +62,16 @@ This section describes the basic Inputs/Outputs of the component.
 ### Inputs
 * `trigger: Observable<void>`: An `Observable` to trigger image capturing. When it fires, an image will be captured and emitted (see Outputs).
 * `width: number`: The maximal video width of the webcam live view.
-* `height: number`: The maximal video height of the webcam live view.
-* `videoOptions: MediaTrackConstraints`: Defines base constraints ([MediaTrackConstraints](https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints)) to apply when requesting the video track.
-* `allowCameraSwitch: boolean`: Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras were found.
+* `height: number`: The maximal video height of the webcam live view. The actual view will be placed within these boundaries, respecting the aspect ratio of the video stream.
+* `videoOptions: MediaTrackConstraints`: Defines constraints ([MediaTrackConstraints](https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints)) to apply when requesting the video track.
+* `allowCameraSwitch: boolean`: Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras are found.
 * `switchCamera: Observable<boolean|string>`: Can be used to cycle through available cameras (true=forward, false=backwards), or to switch to a specific device by deviceId (string).
 
 ### Outputs
-* `imageCapture: EventEmitter<WebcamImage>`: Whenever an image is captured (e.g. triggered by `[trigger]`), the image is emitted via this `EventEmitter`. The image data is contained in the `WebcamImage` data structure.
+* `imageCapture: EventEmitter<WebcamImage>`: Whenever an image is captured (i.e. triggered by `[trigger]`), the image is emitted via this `EventEmitter`. The image data is contained in the `WebcamImage` data structure as both, plain Base64 string and data-url.
 * `imageClick: EventEmitter<void>`: An `EventEmitter` to signal clicks on the webcam area.
 * `initError: EventEmitter<WebcamInitError>`: An `EventEmitter` to signal errors during the webcam initialization.
-* `cameraSwitched: EventEmitter<string>`: Emits the active deviceId after the active video device was switched.
+* `cameraSwitched: EventEmitter<string>`: Emits the active deviceId after the active video device has been switched.
 
 ## Development
 Here you can find instructions on how to start developing this library.
