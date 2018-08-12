@@ -120,6 +120,32 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
+   * Tries to harvest the deviceId from the given mediaStreamTrack object.
+   * Browsers populate this object differently; this method tries some different approaches
+   * to read the id.
+   * @param {MediaStreamTrack} mediaStreamTrack
+   * @returns {string} deviceId if found in the mediaStreamTrack
+   */
+  private static getDeviceIdFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
+    if (mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().deviceId) {
+      return mediaStreamTrack.getSettings().deviceId;
+    } else if (mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().deviceId) {
+      let deviceIdObj: ConstrainDOMString = mediaStreamTrack.getConstraints().deviceId;
+      if (deviceIdObj instanceof String) {
+        return String(deviceIdObj);
+      } else if (Array.isArray(deviceIdObj) && Array(deviceIdObj).length > 0) {
+        return deviceIdObj[0];
+      } else if (typeof deviceIdObj === "object") {
+        if (deviceIdObj["exact"]) {
+          return deviceIdObj["exact"];
+        } else if (deviceIdObj["ideal"]) {
+          return deviceIdObj["ideal"];
+        }
+      }
+    }
+  }
+
+  /**
    * Takes a snapshot of the current webcam's view and emits the image as an event
    */
   public takeSnapshot(): void {
@@ -181,7 +207,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * Otherwise, calculate given the width/height parameters only
    * @param {MediaTrackSettings} mediaTrackSettings
    */
-  private getVideoAspectRatio(mediaTrackSettings: MediaTrackSettings) {
+  private getVideoAspectRatio(mediaTrackSettings: MediaTrackSettings): number {
     if (mediaTrackSettings) {
       if (mediaTrackSettings.aspectRatio) {
         // if ratio is present - use it
@@ -215,7 +241,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
           _video.play();
 
           this.activeVideoSettings = stream.getVideoTracks()[0].getSettings();
-          let activeDeviceId: string = stream.getVideoTracks()[0].getSettings().deviceId;
+          let activeDeviceId: string = WebcamComponent.getDeviceIdFromMediaStreamTrack(stream.getVideoTracks()[0]);
           this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
             .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
           this.videoInitialized = true;
