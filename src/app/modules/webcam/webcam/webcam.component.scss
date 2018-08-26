@@ -3,6 +3,10 @@
   position: relative;
   line-height: 0;
 
+  video.mirrored {
+    transform: scale(-1, 1);
+  }
+
   canvas {
     display: none;
   }

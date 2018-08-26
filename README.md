@@ -22,7 +22,7 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 Runtime Dependencies:
 * Angular: `^4.0.0 || ^5.0.0 || ^6.0.0`
 * RxJs: `^5.0.0 || ^6.0.0`
-* App must be served on secure context (https or localhost)
+* App must be served on a secure context (https or localhost)
 
 Client:
 * [Current Browser](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Browser_compatibility) w/ HTML5 and WebRTC/UserMedia support (Chrome >53, Safari >11, Firefox >38, Edge)
@@ -64,6 +64,7 @@ This section describes the basic Inputs/Outputs of the component.
 * `width: number`: The maximal video width of the webcam live view.
 * `height: number`: The maximal video height of the webcam live view. The actual view will be placed within these boundaries, respecting the aspect ratio of the video stream.
 * `videoOptions: MediaTrackConstraints`: Defines constraints ([MediaTrackConstraints](https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints)) to apply when requesting the video track.
+* `mirrorImage: string | WebcamMirrorProperties`: Flag to control image mirroring. Default: If a webcam claims to be user-facing, the image will be mirrored (x-axis) to provide a better user experience. A value of `never` will prevent mirroring, whereas a value of `always` will mirror every webcam stream, even if the webcam cannot be detected as user-facing. For future extensions, the `WebcamMirrorProperties` object can also be used to set these properties.
 * `allowCameraSwitch: boolean`: Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras are found.
 * `switchCamera: Observable<boolean|string>`: Can be used to cycle through available cameras (true=forward, false=backwards), or to switch to a specific device by deviceId (string).
 

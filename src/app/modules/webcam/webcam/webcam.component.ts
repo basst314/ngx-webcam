@@ -3,6 +3,7 @@ import {WebcamInitError} from "../domain/webcam-init-error";
 import {WebcamImage} from "../domain/webcam-image";
 import {Observable, Subscription} from "rxjs";
 import {WebcamUtil} from "../util/webcam.util";
+import {WebcamMirrorProperties} from "../domain/webcam-mirror-properties";
 
 @Component({
   selector: 'webcam',
@@ -23,6 +24,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Input() public videoOptions: MediaTrackConstraints = WebcamComponent.DEFAULT_VIDEO_OPTIONS;
   /** Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras were found */
   @Input() public allowCameraSwitch: boolean = true;
+  /** Parameter to control image mirroring (i.e. for user-facing camera). ["auto", "always", "never"] */
+  @Input() public mirrorImage: string | WebcamMirrorProperties;
 
   /** Subscription to switchCamera events */
   private switchCameraSubscription: Subscription;
@@ -127,22 +130,61 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * @returns {string} deviceId if found in the mediaStreamTrack
    */
   private static getDeviceIdFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
-    if (mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().deviceId) {
+    if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().deviceId) {
       return mediaStreamTrack.getSettings().deviceId;
-    } else if (mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().deviceId) {
+    } else if (mediaStreamTrack.getConstraints && mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().deviceId) {
       let deviceIdObj: ConstrainDOMString = mediaStreamTrack.getConstraints().deviceId;
-      if (deviceIdObj instanceof String) {
-        return String(deviceIdObj);
-      } else if (Array.isArray(deviceIdObj) && Array(deviceIdObj).length > 0) {
-        return deviceIdObj[0];
-      } else if (typeof deviceIdObj === "object") {
-        if (deviceIdObj["exact"]) {
-          return deviceIdObj["exact"];
-        } else if (deviceIdObj["ideal"]) {
-          return deviceIdObj["ideal"];
+      return WebcamComponent.getValueFromConstrainDOMString(deviceIdObj);
+    }
+  }
+
+  /**
+   * Tries to harvest the facingMode from the given mediaStreamTrack object.
+   * Browsers populate this object differently; this method tries some different approaches
+   * to read the value.
+   * @param {MediaStreamTrack} mediaStreamTrack
+   * @returns {string} facingMode if found in the mediaStreamTrack
+   */
+  private static getFacingModeFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
+    if (mediaStreamTrack) {
+      if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().facingMode) {
+        return mediaStreamTrack.getSettings().facingMode;
+      } else if (mediaStreamTrack.getConstraints && mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().facingMode) {
+        let facingModeConstraint: ConstrainDOMString = mediaStreamTrack.getConstraints().facingMode;
+        return WebcamComponent.getValueFromConstrainDOMString(facingModeConstraint);
+      }
+    }
+  }
+
+  /**
+   * Determines whether the given mediaStreamTrack claims itself as user facing
+   * @param mediaStreamTrack
+   */
+  private static isUserFacing(mediaStreamTrack: MediaStreamTrack): boolean {
+    let facingMode: string = WebcamComponent.getFacingModeFromMediaStreamTrack(mediaStreamTrack);
+    return facingMode ? "user" === facingMode.toLowerCase() : false;
+  }
+
+  /**
+   * Extracts the value from the given ConstrainDOMString
+   * @param constrainDOMString
+   */
+  private static getValueFromConstrainDOMString(constrainDOMString: ConstrainDOMString): string {
+    if (constrainDOMString) {
+      if (constrainDOMString instanceof String) {
+        return String(constrainDOMString);
+      } else if (Array.isArray(constrainDOMString) && Array(constrainDOMString).length > 0) {
+        return String(constrainDOMString[0]);
+      } else if (typeof constrainDOMString === "object") {
+        if (constrainDOMString["exact"]) {
+          return String(constrainDOMString["exact"]);
+        } else if (constrainDOMString["ideal"]) {
+          return String(constrainDOMString["ideal"]);
         }
       }
     }
+
+    return null;
   }
 
   /**
@@ -202,6 +244,16 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     return Math.min(this.height, this.width / videoRatio);
   }
 
+  public get videoStyleClasses() {
+    let classes: string = "";
+
+    if (this.isMirrorImage()) {
+      classes += "mirrored ";
+    }
+
+    return classes.trim();
+  }
+
   /**
    * Return the video aspect ratio from the given mediaTrackSettings, if possible;
    * Otherwise, calculate given the width/height parameters only
@@ -255,6 +307,42 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
       this.initError.next(<WebcamInitError> {message: "Cannot read UserMedia from MediaDevices."});
     }
   }
+
+  private getActiveVideoTrack(): MediaStreamTrack {
+    return this.mediaStream ? this.mediaStream.getVideoTracks()[0] : null;
+  }
+
+  private isMirrorImage(): boolean {
+    if (!this.getActiveVideoTrack()) {
+      return false;
+    }
+
+    // check for explicit mirror override parameter
+    {
+      let mirror: string = "auto";
+      if (this.mirrorImage) {
+        if (typeof this.mirrorImage === "string") {
+          mirror = String(this.mirrorImage).toLowerCase();
+        } else {
+          // WebcamMirrorProperties
+          if (this.mirrorImage.x) {
+            mirror = this.mirrorImage.x.toLowerCase();
+          }
+        }
+      }
+
+      switch (mirror) {
+        case "always":
+          return true;
+        case "never":
+          return false;
+      }
+    }
+
+    // default: enable mirroring if webcam is user facing
+    return WebcamComponent.isUserFacing(this.getActiveVideoTrack());
+  }
+
 
   /**
    * Stops all active media tracks.
