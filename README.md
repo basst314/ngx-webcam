@@ -16,7 +16,7 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 * Smartphone compatibility for modern OS's (OS must support WebRTC/UserMedia API)
 * Access to front- and back-camera, if multiple cameras exist
 * Portrait & Landscape mode on smartphones
-* Controllable front camera mirror view for enhanced user experience
+* Mirrored view for user-facing cameras, to enhance user experience (i.e. on smartphones)
 
 
 ## Prerequisites
