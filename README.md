@@ -1,4 +1,5 @@
-# Ngx-Webcam
+# Ngx-Webcam [![npm version](https://badge.fury.io/js/ngx-webcam.svg)](https://badge.fury.io/js/ngx-webcam)
+
 A simple Angular 4+ Webcam-Component. Pure &amp; minimal, no Flash-Fallback. <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">See the Demo!</a>
 
 **Plug-and-play.** This library contains a single webcam-module which can be imported into nearly every Angular 4+ project.
