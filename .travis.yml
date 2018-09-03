@@ -1,0 +1,19 @@
+sudo: required
+dist: trusty
+addons:
+  chrome: stable
+
+language: node_js
+node_js:
+- "10"
+
+branches:
+  only:
+  - master
+
+before_script:
+- npm install -g @angular/cli
+
+script:
+- npm run packagr
+- ng test --watch false
