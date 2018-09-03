@@ -17,4 +17,4 @@ install:
 
 script:
 - npm run packagr
-- ng test --watch false
+- npm run test -- --watch=false --progress=false --browsers=ChromeHeadlessCI
