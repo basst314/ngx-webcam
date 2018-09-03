@@ -17,4 +17,5 @@ install:
 
 script:
 - npm run packagr
-- npm run test -- --watch=false --progress=false --browsers=ChromeHeadlessCI
+- ng test --watch=false --progress=false --browsers=ChromeHeadlessCI
+- ng e2e --protractor-config=./protractor-ci.conf.js
