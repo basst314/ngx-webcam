@@ -1,18 +1,19 @@
-sudo: required
 dist: trusty
-addons:
-  chrome: stable
+sudo: false
 
 language: node_js
 node_js:
 - "10"
 
-branches:
-  only:
-  - master
+addons:
+  chrome: stable
 
-before_script:
-- npm install -g @angular/cli
+cache:
+  directories:
+  - ./node_modules
+
+install:
+  - npm install
 
 script:
 - npm run packagr
