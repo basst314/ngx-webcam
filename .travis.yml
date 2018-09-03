@@ -1,0 +1,21 @@
+dist: trusty
+sudo: false
+
+language: node_js
+node_js:
+- "10"
+
+addons:
+  chrome: stable
+
+cache:
+  directories:
+  - ./node_modules
+
+install:
+  - npm install
+
+script:
+- npm run packagr
+- ng test --watch=false --progress=false --browsers=ChromeHeadlessCI
+- ng e2e --protractor-config=./protractor-ci.conf.js
