@@ -1,6 +1,8 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {WebcamComponent} from './webcam.component';
+import {map} from 'rxjs/operators';
+
 
 describe('WebcamComponent', () => {
   let component: WebcamComponent;
@@ -29,5 +31,26 @@ describe('WebcamComponent', () => {
   it('should render a canvas tag', async(() => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('canvas')).toBeTruthy();
+  }));
+
+  it('should takesnapshot and provide WebcamImage object', async(() => {
+    let imageCapture$ = component.imageCapture.asObservable();
+
+    let base64: string = null
+    let dataUrl: string = null;
+    let imageData: ImageData = null;
+
+    imageCapture$
+      .subscribe(p => {
+        base64 = p.imageAsBase64;
+        dataUrl = p.imageAsDataUrl;
+        imageData = p.imageData;
+      });
+    component.takeSnapshot();
+
+    expect(base64).not.toBeNull();
+    expect(dataUrl).not.toBeNull();
+    expect(imageData).not.toBeNull();
+    expect(imageData.data).not.toBeNull();
   }));
 });

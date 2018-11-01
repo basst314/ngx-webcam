@@ -1,15 +1,17 @@
 /**
  * Container class for a captured webcam image
- * @author basst314
+ * @author basst314, davidshen84
  */
 export class WebcamImage {
   private _mimeType: string = null;
   private _imageAsBase64: string = null;
   private _imageAsDataUrl: string = null;
+  private _imageData: ImageData = null;
 
-  public constructor(imageAsDataUrl: string, mimeType: string) {
+  public constructor(imageAsDataUrl: string, mimeType: string, imageData: ImageData) {
     this._mimeType = mimeType;
     this._imageAsDataUrl = imageAsDataUrl;
+    this._imageData = imageData;
   }
 
   /**
@@ -27,6 +29,14 @@ export class WebcamImage {
    */
   public get imageAsDataUrl(): string {
     return this._imageAsDataUrl;
+  }
+
+  /**
+   * Get the ImageData object associated with the canvas' 2d context.
+   * @returns {ImageData} the ImageData of the canvas's 2d context.
+   */
+  public get imageData(): ImageData {
+    return this._imageData;
   }
 
   /**

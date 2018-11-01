@@ -204,14 +204,18 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     _canvas.height = dimensions.height;
 
     // paint snapshot image to canvas
-    _canvas.getContext('2d').drawImage(this.video.nativeElement, 0, 0);
+    let context2d = _canvas.getContext('2d');
+    context2d.drawImage(this.video.nativeElement, 0, 0);
 
     // read canvas content as image
     // TODO allow mimeType options as Input()
     let mimeType: string = "image/jpeg";
     let dataUrl: string = _canvas.toDataURL(mimeType);
 
-    this.imageCapture.next(new WebcamImage(dataUrl, mimeType));
+    // get the ImageData object from the canvas' context.
+    let imageData: ImageData = context2d.getImageData(0, 0, _canvas.width, _canvas.height);
+
+    this.imageCapture.next(new WebcamImage(dataUrl, mimeType, imageData));
   }
 
   /**
