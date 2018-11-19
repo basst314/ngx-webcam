@@ -16,7 +16,7 @@ export class WebcamImage {
 
   /**
    * Get the base64 encoded image data
-   * @returns {string} base64 data of the image
+   * @returns base64 data of the image
    */
   public get imageAsBase64(): string {
     return this._imageAsBase64 ?
@@ -25,7 +25,7 @@ export class WebcamImage {
 
   /**
    * Get the encoded image as dataUrl
-   * @returns {string} the dataUrl of the image
+   * @returns the dataUrl of the image
    */
   public get imageAsDataUrl(): string {
     return this._imageAsDataUrl;
@@ -33,7 +33,7 @@ export class WebcamImage {
 
   /**
    * Get the ImageData object associated with the canvas' 2d context.
-   * @returns {ImageData} the ImageData of the canvas's 2d context.
+   * @returns the ImageData of the canvas's 2d context.
    */
   public get imageData(): ImageData {
     return this._imageData;
@@ -41,7 +41,7 @@ export class WebcamImage {
 
   /**
    * Extracts the Base64 data out of the given dataUrl.
-   * @param {string} dataUrl the given dataUrl
+   * @param dataUrl the given dataUrl
    */
   private getDataFromDataUrl(dataUrl: string) {
     return dataUrl.replace("data:" + this._mimeType + ";base64,", "");

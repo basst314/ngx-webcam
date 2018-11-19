@@ -109,9 +109,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
   /**
    * Get MediaTrackConstraints to request streaming the given device
-   * @param {string} deviceId
+   * @param deviceId
    * @param baseMediaTrackConstraints base constraints to merge deviceId-constraint into
-   * @returns {MediaTrackConstraints}
+   * @returns
    */
   private static getMediaConstraintsForDevice(deviceId: string, baseMediaTrackConstraints: MediaTrackConstraints): MediaTrackConstraints {
     let result: MediaTrackConstraints = baseMediaTrackConstraints ? baseMediaTrackConstraints : this.DEFAULT_VIDEO_OPTIONS;
@@ -126,8 +126,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * Tries to harvest the deviceId from the given mediaStreamTrack object.
    * Browsers populate this object differently; this method tries some different approaches
    * to read the id.
-   * @param {MediaStreamTrack} mediaStreamTrack
-   * @returns {string} deviceId if found in the mediaStreamTrack
+   * @param mediaStreamTrack
+   * @returns deviceId if found in the mediaStreamTrack
    */
   private static getDeviceIdFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
     if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().deviceId) {
@@ -142,8 +142,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * Tries to harvest the facingMode from the given mediaStreamTrack object.
    * Browsers populate this object differently; this method tries some different approaches
    * to read the value.
-   * @param {MediaStreamTrack} mediaStreamTrack
-   * @returns {string} facingMode if found in the mediaStreamTrack
+   * @param mediaStreamTrack
+   * @returns facingMode if found in the mediaStreamTrack
    */
   private static getFacingModeFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
     if (mediaStreamTrack) {
@@ -220,7 +220,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
   /**
    * Switches to the next/previous video device
-   * @param {boolean} forward
+   * @param forward
    */
   public rotateVideoInput(forward: boolean) {
     if (this.availableVideoInputs && this.availableVideoInputs.length > 1) {
@@ -261,7 +261,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /**
    * Return the video aspect ratio from the given mediaTrackSettings, if possible;
    * Otherwise, calculate given the width/height parameters only
-   * @param {MediaTrackSettings} mediaTrackSettings
+   * @param mediaTrackSettings
    */
   private getVideoAspectRatio(mediaTrackSettings: MediaTrackSettings): number {
     if (mediaTrackSettings) {

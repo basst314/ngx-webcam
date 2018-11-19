@@ -2,7 +2,7 @@ export class WebcamUtil {
 
   /**
    * Lists available videoInput devices
-   * @returns {Promise<MediaDeviceInfo[]>}
+   * @returns a list of media device info.
    */
   public static getAvailableVideoInputs(): Promise<MediaDeviceInfo[]> {
     if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
