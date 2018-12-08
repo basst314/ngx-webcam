@@ -6,7 +6,7 @@ export class WebcamUtil {
    */
   public static getAvailableVideoInputs(): Promise<MediaDeviceInfo[]> {
     if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-      return Promise.reject("enumerateDevices() not supported.");
+      return Promise.reject('enumerateDevices() not supported.');
     }
 
     return new Promise((resolve, reject) => {

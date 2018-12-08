@@ -3,16 +3,6 @@
  * @author basst314, davidshen84
  */
 export class WebcamImage {
-  private _mimeType: string = null;
-  private _imageAsBase64: string = null;
-  private _imageAsDataUrl: string = null;
-  private _imageData: ImageData = null;
-
-  public constructor(imageAsDataUrl: string, mimeType: string, imageData: ImageData) {
-    this._mimeType = mimeType;
-    this._imageAsDataUrl = imageAsDataUrl;
-    this._imageData = imageData;
-  }
 
   /**
    * Get the base64 encoded image data
@@ -20,7 +10,7 @@ export class WebcamImage {
    */
   public get imageAsBase64(): string {
     return this._imageAsBase64 ?
-      this._imageAsBase64 : this._imageAsBase64 = this.getDataFromDataUrl(this._imageAsDataUrl);
+      this._imageAsBase64 : this._imageAsBase64 = WebcamImage.getDataFromDataUrl(this._imageAsDataUrl);
   }
 
   /**
@@ -39,11 +29,21 @@ export class WebcamImage {
     return this._imageData;
   }
 
+  public constructor(imageAsDataUrl: string, mimeType: string, imageData: ImageData) {
+    this._mimeType = mimeType;
+    this._imageAsDataUrl = imageAsDataUrl;
+    this._imageData = imageData;
+  }
+  private readonly _mimeType: string = null;
+  private _imageAsBase64: string = null;
+  private readonly _imageAsDataUrl: string = null;
+  private readonly _imageData: ImageData = null;
+
   /**
    * Extracts the Base64 data out of the given dataUrl.
    * @param dataUrl the given dataUrl
    */
-  private getDataFromDataUrl(dataUrl: string) {
-    return dataUrl.replace("data:" + this._mimeType + ";base64,", "");
+  private static getDataFromDataUrl(dataUrl: string) {
+    return dataUrl.replace(`data: {this._mimeType};base64,`, '');
   }
 }
