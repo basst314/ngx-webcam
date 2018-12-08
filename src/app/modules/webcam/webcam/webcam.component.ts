@@ -23,11 +23,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Input() public allowCameraSwitch: boolean = true;
   /** Parameter to control image mirroring (i.e. for user-facing camera). ["auto", "always", "never"] */
   @Input() public mirrorImage: string | WebcamMirrorProperties;
-  /** available video devices */
-  public availableVideoInputs: MediaDeviceInfo[] = [];
+  /** Flag to control whether an ImageData object is stored into the WebcamImage object. */
+  @Input() public captureImageData: boolean = false;
 
-  /** Indicates whether the video device is ready to be switched */
-  public videoInitialized: boolean = false;
   /** EventEmitter which fires when an image has been captured */
   @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
   /** Emits a mediaError if webcam cannot be initialized (e.g. missing user permissions) */
@@ -36,6 +34,13 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Output() public imageClick: EventEmitter<void> = new EventEmitter<void>();
   /** Emits the active deviceId after the active video device was switched */
   @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<string>();
+
+  /** available video devices */
+  public availableVideoInputs: MediaDeviceInfo[] = [];
+
+  /** Indicates whether the video device is ready to be switched */
+  public videoInitialized: boolean = false;
+
   /** If the Observable represented by this subscription emits, an image will be captured and emitted through
    * the 'imageCapture' EventEmitter */
   private triggerSubscription: Subscription;
@@ -229,7 +234,11 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     const dataUrl: string = _canvas.toDataURL(mimeType);
 
     // get the ImageData object from the canvas' context.
-    const imageData: ImageData = context2d.getImageData(0, 0, _canvas.width, _canvas.height);
+    let imageData: ImageData = null;
+
+    if (this.captureImageData) {
+      imageData = context2d.getImageData(0, 0, _canvas.width, _canvas.height);
+    }
 
     this.imageCapture.next(new WebcamImage(dataUrl, mimeType, imageData));
   }

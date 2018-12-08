@@ -34,6 +34,7 @@ export class WebcamImage {
     this._imageAsDataUrl = imageAsDataUrl;
     this._imageData = imageData;
   }
+
   private readonly _mimeType: string = null;
   private _imageAsBase64: string = null;
   private readonly _imageAsDataUrl: string = null;

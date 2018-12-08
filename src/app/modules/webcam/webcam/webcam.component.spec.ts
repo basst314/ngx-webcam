@@ -9,9 +9,9 @@ describe('WebcamComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WebcamComponent ]
+      declarations: [WebcamComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -32,7 +32,28 @@ describe('WebcamComponent', () => {
     expect(compiled.querySelector('canvas')).toBeTruthy();
   }));
 
-  it('should take snapshot and provide WebcamImage object', async(() => {
+  it('should take snapshot without capturing the WebcamImage object', async(() => {
+    const imageCapture$ = component.imageCapture.asObservable();
+
+    let base64: string = null;
+    let dataUrl: string = null;
+    let imageData: ImageData = null;
+
+    imageCapture$
+      .subscribe(p => {
+        base64 = p.imageAsBase64;
+        dataUrl = p.imageAsDataUrl;
+        imageData = p.imageData;
+      });
+    component.takeSnapshot();
+
+    expect(base64).not.toBeNull();
+    expect(dataUrl).not.toBeNull();
+    expect(imageData).toBeNull();
+  }));
+
+  it('should take snapshot and capture the WebcamImage object', async(() => {
+    component.captureImageData = true;
     const imageCapture$ = component.imageCapture.asObservable();
 
     let base64: string = null;
