@@ -1,9 +1,9 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
-import {WebcamInitError} from "../domain/webcam-init-error";
-import {WebcamImage} from "../domain/webcam-image";
-import {Observable, Subscription} from "rxjs";
-import {WebcamUtil} from "../util/webcam.util";
-import {WebcamMirrorProperties} from "../domain/webcam-mirror-properties";
+import {WebcamInitError} from '../domain/webcam-init-error';
+import {WebcamImage} from '../domain/webcam-image';
+import {Observable, Subscription} from 'rxjs';
+import {WebcamUtil} from '../util/webcam.util';
+import {WebcamMirrorProperties} from '../domain/webcam-mirror-properties';
 
 @Component({
   selector: 'webcam',
@@ -17,28 +17,14 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Input() public width: number = 640;
   /** Defines the max height of the webcam area in px */
   @Input() public height: number = 480;
-  /** If the Observable represented by this subscription emits, an image will be captured and emitted through
-   * the 'imageCapture' EventEmitter */
-  private triggerSubscription: Subscription;
   /** Defines base constraints to apply when requesting video track from UserMedia */
   @Input() public videoOptions: MediaTrackConstraints = WebcamComponent.DEFAULT_VIDEO_OPTIONS;
   /** Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras were found */
   @Input() public allowCameraSwitch: boolean = true;
   /** Parameter to control image mirroring (i.e. for user-facing camera). ["auto", "always", "never"] */
   @Input() public mirrorImage: string | WebcamMirrorProperties;
-
-  /** Subscription to switchCamera events */
-  private switchCameraSubscription: Subscription;
-
-  /** MediaStream object in use for streaming UserMedia data */
-  private mediaStream: MediaStream = null;
-
-  /** available video devices */
-  public availableVideoInputs: MediaDeviceInfo[] = [];
-  /** Index of active video in availableVideoInputs */
-  private activeVideoInputIndex: number = -1;
-  /** Indicates whether the video device is ready to be switched */
-  public videoInitialized: boolean = false;
+  /** Flag to control whether an ImageData object is stored into the WebcamImage object. */
+  @Input() public captureImageData: boolean = false;
 
   /** EventEmitter which fires when an image has been captured */
   @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
@@ -49,12 +35,147 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /** Emits the active deviceId after the active video device was switched */
   @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<string>();
 
+  /** available video devices */
+  public availableVideoInputs: MediaDeviceInfo[] = [];
+
+  /** Indicates whether the video device is ready to be switched */
+  public videoInitialized: boolean = false;
+
+  /** If the Observable represented by this subscription emits, an image will be captured and emitted through
+   * the 'imageCapture' EventEmitter */
+  private triggerSubscription: Subscription;
+  /** Index of active video in availableVideoInputs */
+  private activeVideoInputIndex: number = -1;
+  /** Subscription to switchCamera events */
+  private switchCameraSubscription: Subscription;
+  /** MediaStream object in use for streaming UserMedia data */
+  private mediaStream: MediaStream = null;
   @ViewChild('video') private video: any;
-  // Canvas for Video Snapshots
+  /** Canvas for Video Snapshots */
   @ViewChild('canvas') private canvas: any;
 
-  // width and height of the active video stream
+  /** width and height of the active video stream */
   private activeVideoSettings: MediaTrackSettings = null;
+
+  /**
+   * If the given Observable emits, an image will be captured and emitted through 'imageCapture' EventEmitter
+   */
+  @Input()
+  public set trigger(trigger: Observable<void>) {
+    if (this.triggerSubscription) {
+      this.triggerSubscription.unsubscribe();
+    }
+
+    // Subscribe to events from this Observable to take snapshots
+    this.triggerSubscription = trigger.subscribe(() => {
+      this.takeSnapshot();
+    });
+  }
+
+  /**
+   * If the given Observable emits, the active webcam will be switched to the one indicated by the emitted value.
+   * @param switchCamera Indicates which webcam to switch to
+   *   true: cycle forwards through available webcams
+   *   false: cycle backwards through available webcams
+   *   string: activate the webcam with the given id
+   */
+  @Input()
+  public set switchCamera(switchCamera: Observable<boolean | string>) {
+    if (this.switchCameraSubscription) {
+      this.switchCameraSubscription.unsubscribe();
+    }
+
+    // Subscribe to events from this Observable to switch video device
+    this.switchCameraSubscription = switchCamera.subscribe((value: boolean | string) => {
+      if (typeof value === 'string') {
+        // deviceId was specified
+        this.switchToVideoInput(value);
+      } else {
+        // direction was specified
+        this.rotateVideoInput(value !== false);
+      }
+    });
+  }
+
+  /**
+   * Get MediaTrackConstraints to request streaming the given device
+   * @param deviceId
+   * @param baseMediaTrackConstraints base constraints to merge deviceId-constraint into
+   * @returns
+   */
+  private static getMediaConstraintsForDevice(deviceId: string, baseMediaTrackConstraints: MediaTrackConstraints): MediaTrackConstraints {
+    const result: MediaTrackConstraints = baseMediaTrackConstraints ? baseMediaTrackConstraints : this.DEFAULT_VIDEO_OPTIONS;
+    if (deviceId) {
+      result.deviceId = {exact: deviceId};
+    }
+
+    return result;
+  }
+
+  /**
+   * Tries to harvest the deviceId from the given mediaStreamTrack object.
+   * Browsers populate this object differently; this method tries some different approaches
+   * to read the id.
+   * @param mediaStreamTrack
+   * @returns deviceId if found in the mediaStreamTrack
+   */
+  private static getDeviceIdFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
+    if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().deviceId) {
+      return mediaStreamTrack.getSettings().deviceId;
+    } else if (mediaStreamTrack.getConstraints && mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().deviceId) {
+      const deviceIdObj: ConstrainDOMString = mediaStreamTrack.getConstraints().deviceId;
+      return WebcamComponent.getValueFromConstrainDOMString(deviceIdObj);
+    }
+  }
+
+  /**
+   * Tries to harvest the facingMode from the given mediaStreamTrack object.
+   * Browsers populate this object differently; this method tries some different approaches
+   * to read the value.
+   * @param mediaStreamTrack
+   * @returns facingMode if found in the mediaStreamTrack
+   */
+  private static getFacingModeFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
+    if (mediaStreamTrack) {
+      if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().facingMode) {
+        return mediaStreamTrack.getSettings().facingMode;
+      } else if (mediaStreamTrack.getConstraints && mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().facingMode) {
+        const facingModeConstraint: ConstrainDOMString = mediaStreamTrack.getConstraints().facingMode;
+        return WebcamComponent.getValueFromConstrainDOMString(facingModeConstraint);
+      }
+    }
+  }
+
+  /**
+   * Determines whether the given mediaStreamTrack claims itself as user facing
+   * @param mediaStreamTrack
+   */
+  private static isUserFacing(mediaStreamTrack: MediaStreamTrack): boolean {
+    const facingMode: string = WebcamComponent.getFacingModeFromMediaStreamTrack(mediaStreamTrack);
+    return facingMode ? 'user' === facingMode.toLowerCase() : false;
+  }
+
+  /**
+   * Extracts the value from the given ConstrainDOMString
+   * @param constrainDOMString
+   */
+  private static getValueFromConstrainDOMString(constrainDOMString: ConstrainDOMString): string {
+    if (constrainDOMString) {
+      if (constrainDOMString instanceof String) {
+        return String(constrainDOMString);
+      } else if (Array.isArray(constrainDOMString) && Array(constrainDOMString).length > 0) {
+        return String(constrainDOMString[0]);
+      } else if (typeof constrainDOMString === 'object') {
+        if (constrainDOMString['exact']) {
+          return String(constrainDOMString['exact']);
+        } else if (constrainDOMString['ideal']) {
+          return String(constrainDOMString['ideal']);
+        }
+      }
+    }
+
+    return null;
+  }
 
   public ngAfterViewInit(): void {
     this.detectAvailableDevices()
@@ -75,153 +196,49 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * If the given Observable emits, an image will be captured and emitted through 'imageCapture' EventEmitter
-   */
-  @Input()
-  public set trigger(trigger: Observable<void>) {
-    if (this.triggerSubscription) {
-      this.triggerSubscription.unsubscribe();
-    }
-
-    // Subscribe to events from this Observable to take snapshots
-    this.triggerSubscription = trigger.subscribe(() => {
-      this.takeSnapshot();
-    });
-  }
-
-  @Input()
-  public set switchCamera(switchCamera: Observable<boolean | string>) {
-    if (this.switchCameraSubscription) {
-      this.switchCameraSubscription.unsubscribe();
-    }
-
-    // Subscribe to events from this Observable to switch video device
-    this.switchCameraSubscription = switchCamera.subscribe((value: boolean | string) => {
-      if (typeof value === 'string') {
-        // deviceId was specified
-        this.switchToVideoInput(value);
-      } else {
-        // direction was specified
-        this.rotateVideoInput(value !== false);
-      }
-    })
-  }
-
-  /**
-   * Get MediaTrackConstraints to request streaming the given device
-   * @param {string} deviceId
-   * @param baseMediaTrackConstraints base constraints to merge deviceId-constraint into
-   * @returns {MediaTrackConstraints}
-   */
-  private static getMediaConstraintsForDevice(deviceId: string, baseMediaTrackConstraints: MediaTrackConstraints): MediaTrackConstraints {
-    let result: MediaTrackConstraints = baseMediaTrackConstraints ? baseMediaTrackConstraints : this.DEFAULT_VIDEO_OPTIONS;
-    if (deviceId) {
-      result.deviceId = {exact: deviceId};
-    }
-
-    return result;
-  }
-
-  /**
-   * Tries to harvest the deviceId from the given mediaStreamTrack object.
-   * Browsers populate this object differently; this method tries some different approaches
-   * to read the id.
-   * @param {MediaStreamTrack} mediaStreamTrack
-   * @returns {string} deviceId if found in the mediaStreamTrack
-   */
-  private static getDeviceIdFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
-    if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().deviceId) {
-      return mediaStreamTrack.getSettings().deviceId;
-    } else if (mediaStreamTrack.getConstraints && mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().deviceId) {
-      let deviceIdObj: ConstrainDOMString = mediaStreamTrack.getConstraints().deviceId;
-      return WebcamComponent.getValueFromConstrainDOMString(deviceIdObj);
-    }
-  }
-
-  /**
-   * Tries to harvest the facingMode from the given mediaStreamTrack object.
-   * Browsers populate this object differently; this method tries some different approaches
-   * to read the value.
-   * @param {MediaStreamTrack} mediaStreamTrack
-   * @returns {string} facingMode if found in the mediaStreamTrack
-   */
-  private static getFacingModeFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
-    if (mediaStreamTrack) {
-      if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().facingMode) {
-        return mediaStreamTrack.getSettings().facingMode;
-      } else if (mediaStreamTrack.getConstraints && mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().facingMode) {
-        let facingModeConstraint: ConstrainDOMString = mediaStreamTrack.getConstraints().facingMode;
-        return WebcamComponent.getValueFromConstrainDOMString(facingModeConstraint);
-      }
-    }
-  }
-
-  /**
-   * Determines whether the given mediaStreamTrack claims itself as user facing
-   * @param mediaStreamTrack
-   */
-  private static isUserFacing(mediaStreamTrack: MediaStreamTrack): boolean {
-    let facingMode: string = WebcamComponent.getFacingModeFromMediaStreamTrack(mediaStreamTrack);
-    return facingMode ? "user" === facingMode.toLowerCase() : false;
-  }
-
-  /**
-   * Extracts the value from the given ConstrainDOMString
-   * @param constrainDOMString
-   */
-  private static getValueFromConstrainDOMString(constrainDOMString: ConstrainDOMString): string {
-    if (constrainDOMString) {
-      if (constrainDOMString instanceof String) {
-        return String(constrainDOMString);
-      } else if (Array.isArray(constrainDOMString) && Array(constrainDOMString).length > 0) {
-        return String(constrainDOMString[0]);
-      } else if (typeof constrainDOMString === "object") {
-        if (constrainDOMString["exact"]) {
-          return String(constrainDOMString["exact"]);
-        } else if (constrainDOMString["ideal"]) {
-          return String(constrainDOMString["ideal"]);
-        }
-      }
-    }
-
-    return null;
-  }
-
-  /**
    * Takes a snapshot of the current webcam's view and emits the image as an event
    */
   public takeSnapshot(): void {
     // set canvas size to actual video size
-    let _video = this.video.nativeElement;
-    let dimensions = {width: this.width, height: this.height};
+    const _video = this.video.nativeElement;
+    const dimensions = {width: this.width, height: this.height};
     if (_video.videoWidth) {
       dimensions.width = _video.videoWidth;
       dimensions.height = _video.videoHeight;
     }
 
-    let _canvas = this.canvas.nativeElement;
+    const _canvas = this.canvas.nativeElement;
     _canvas.width = dimensions.width;
     _canvas.height = dimensions.height;
 
     // paint snapshot image to canvas
-    _canvas.getContext('2d').drawImage(this.video.nativeElement, 0, 0);
+    const context2d = _canvas.getContext('2d');
+    context2d.drawImage(this.video.nativeElement, 0, 0);
 
     // read canvas content as image
     // TODO allow mimeType options as Input()
-    let mimeType: string = "image/jpeg";
-    let dataUrl: string = _canvas.toDataURL(mimeType);
+    const mimeType: string = 'image/jpeg';
+    const dataUrl: string = _canvas.toDataURL(mimeType);
 
-    this.imageCapture.next(new WebcamImage(dataUrl, mimeType));
+    // get the ImageData object from the canvas' context.
+    let imageData: ImageData = null;
+
+    if (this.captureImageData) {
+      imageData = context2d.getImageData(0, 0, _canvas.width, _canvas.height);
+    }
+
+    this.imageCapture.next(new WebcamImage(dataUrl, mimeType, imageData));
   }
 
   /**
    * Switches to the next/previous video device
-   * @param {boolean} forward
+   * @param forward
    */
   public rotateVideoInput(forward: boolean) {
     if (this.availableVideoInputs && this.availableVideoInputs.length > 1) {
-      let increment: number = forward ? 1 : (this.availableVideoInputs.length - 1);
-      this.switchToVideoInput(this.availableVideoInputs[(this.activeVideoInputIndex + increment) % this.availableVideoInputs.length].deviceId)
+      const increment: number = forward ? 1 : (this.availableVideoInputs.length - 1);
+      const nextInputIndex = (this.activeVideoInputIndex + increment) % this.availableVideoInputs.length;
+      this.switchToVideoInput(this.availableVideoInputs[nextInputIndex].deviceId);
     }
   }
 
@@ -235,20 +252,20 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   }
 
   public get videoWidth() {
-    let videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
+    const videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
     return Math.min(this.width, this.height * videoRatio);
   }
 
   public get videoHeight() {
-    let videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
+    const videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
     return Math.min(this.height, this.width / videoRatio);
   }
 
   public get videoStyleClasses() {
-    let classes: string = "";
+    let classes: string = '';
 
     if (this.isMirrorImage()) {
-      classes += "mirrored ";
+      classes += 'mirrored ';
     }
 
     return classes.trim();
@@ -257,7 +274,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /**
    * Return the video aspect ratio from the given mediaTrackSettings, if possible;
    * Otherwise, calculate given the width/height parameters only
-   * @param {MediaTrackSettings} mediaTrackSettings
+   * @param mediaTrackSettings
    */
   private getVideoAspectRatio(mediaTrackSettings: MediaTrackSettings): number {
     if (mediaTrackSettings) {
@@ -280,11 +297,11 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * Init webcam live view
    */
   private initWebcam(deviceId: string, userVideoTrackConstraints: MediaTrackConstraints) {
-    let _video = this.video.nativeElement;
+    const _video = this.video.nativeElement;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
       // merge deviceId -> userVideoTrackConstraints
-      let videoTrackConstraints = WebcamComponent.getMediaConstraintsForDevice(deviceId, userVideoTrackConstraints);
+      const videoTrackConstraints = WebcamComponent.getMediaConstraintsForDevice(deviceId, userVideoTrackConstraints);
 
       navigator.mediaDevices.getUserMedia(<MediaStreamConstraints>{video: videoTrackConstraints})
         .then((stream: MediaStream) => {
@@ -293,7 +310,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
           _video.play();
 
           this.activeVideoSettings = stream.getVideoTracks()[0].getSettings();
-          let activeDeviceId: string = WebcamComponent.getDeviceIdFromMediaStreamTrack(stream.getVideoTracks()[0]);
+          const activeDeviceId: string = WebcamComponent.getDeviceIdFromMediaStreamTrack(stream.getVideoTracks()[0]);
           this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
             .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
           this.videoInitialized = true;
@@ -304,7 +321,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
           this.initError.next(<WebcamInitError>{message: err.message, mediaStreamError: err});
         });
     } else {
-      this.initError.next(<WebcamInitError> {message: "Cannot read UserMedia from MediaDevices."});
+      this.initError.next(<WebcamInitError>{message: 'Cannot read UserMedia from MediaDevices.'});
     }
   }
 
@@ -319,9 +336,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
     // check for explicit mirror override parameter
     {
-      let mirror: string = "auto";
+      let mirror: string = 'auto';
       if (this.mirrorImage) {
-        if (typeof this.mirrorImage === "string") {
+        if (typeof this.mirrorImage === 'string') {
           mirror = String(this.mirrorImage).toLowerCase();
         } else {
           // WebcamMirrorProperties
@@ -332,9 +349,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
       }
 
       switch (mirror) {
-        case "always":
+        case 'always':
           return true;
-        case "never":
+        case 'never':
           return false;
       }
     }

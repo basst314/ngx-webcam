@@ -1,8 +1,8 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {AppComponent} from './app.component';
-import {WebcamModule} from "./modules/webcam/webcam.module";
-import {FormsModule} from "@angular/forms";
+import {WebcamModule} from './modules/webcam/webcam.module';
+import {FormsModule} from '@angular/forms';
 
 
 @NgModule({

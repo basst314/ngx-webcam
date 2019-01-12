@@ -1,7 +1,7 @@
 import {async, TestBed} from '@angular/core/testing';
 import {AppComponent} from './app.component';
-import {WebcamComponent} from "./modules/webcam/webcam/webcam.component";
-import {FormsModule} from "@angular/forms";
+import {WebcamComponent} from './modules/webcam/webcam/webcam.component';
+import {FormsModule} from '@angular/forms';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {

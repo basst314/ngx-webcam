@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import {WebcamImage} from "./modules/webcam/domain/webcam-image";
-import {WebcamUtil} from "./modules/webcam/util/webcam.util";
-import {WebcamInitError} from "./modules/webcam/domain/webcam-init-error";
+import {WebcamImage} from './modules/webcam/domain/webcam-image';
+import {WebcamUtil} from './modules/webcam/util/webcam.util';
+import {WebcamInitError} from './modules/webcam/domain/webcam-init-error';
 
 @Component({
-  selector: 'app-root',
+  selector: 'appRoot',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -16,8 +16,8 @@ export class AppComponent implements OnInit {
   public multipleWebcamsAvailable = false;
   public deviceId: string;
   public videoOptions: MediaTrackConstraints = {
-    //width: {ideal: 1024},
-    //height: {ideal: 576}
+    // width: {ideal: 1024},
+    // height: {ideal: 576}
   };
   public errors: WebcamInitError[] = [];
 
@@ -56,12 +56,12 @@ export class AppComponent implements OnInit {
   }
 
   public handleImage(webcamImage: WebcamImage): void {
-    console.info("received webcam image", webcamImage);
+    console.log('received webcam image', webcamImage);
     this.webcamImage = webcamImage;
   }
 
   public cameraWasSwitched(deviceId: string): void {
-    console.log("active device: " + deviceId);
+    console.log('active device: ' + deviceId);
     this.deviceId = deviceId;
   }
 

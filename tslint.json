@@ -71,7 +71,7 @@
     "no-empty-interface": true,
     "no-eval": true,
     "no-inferrable-types": [
-      true,
+      false,
       "ignore-params"
     ],
     "no-misused-new": true,
@@ -117,7 +117,6 @@
         "variable-declaration": "nospace"
       }
     ],
-    "typeof-compare": true,
     "unified-signatures": true,
     "variable-name": false,
     "whitespace": [
@@ -137,8 +136,8 @@
     "component-selector": [
       true,
       "element",
-      "app",
-      "kebab-case"
+      ["app", "webcam"],
+      "camelCase"
     ],
     "no-output-on-prefix": true,
     "use-input-property-decorator": true,

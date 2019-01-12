@@ -1,39 +1,53 @@
 /**
  * Container class for a captured webcam image
- * @author basst314
+ * @author basst314, davidshen84
  */
 export class WebcamImage {
-  private _mimeType: string = null;
-  private _imageAsBase64: string = null;
-  private _imageAsDataUrl: string = null;
 
-  public constructor(imageAsDataUrl: string, mimeType: string) {
+  public constructor(imageAsDataUrl: string, mimeType: string, imageData: ImageData) {
     this._mimeType = mimeType;
     this._imageAsDataUrl = imageAsDataUrl;
+    this._imageData = imageData;
+  }
+
+  private readonly _mimeType: string = null;
+  private _imageAsBase64: string = null;
+  private readonly _imageAsDataUrl: string = null;
+  private readonly _imageData: ImageData = null;
+
+
+  /**
+   * Extracts the Base64 data out of the given dataUrl.
+   * @param dataUrl the given dataUrl
+   * @param mimeType the mimeType of the data
+   */
+  private static getDataFromDataUrl(dataUrl: string, mimeType: string) {
+    return dataUrl.replace(`data:${mimeType};base64,`, '');
   }
 
   /**
    * Get the base64 encoded image data
-   * @returns {string} base64 data of the image
+   * @returns base64 data of the image
    */
   public get imageAsBase64(): string {
-    return this._imageAsBase64 ?
-      this._imageAsBase64 : this._imageAsBase64 = this.getDataFromDataUrl(this._imageAsDataUrl);
+    return this._imageAsBase64 ? this._imageAsBase64
+      : this._imageAsBase64 = WebcamImage.getDataFromDataUrl(this._imageAsDataUrl, this._mimeType);
   }
 
   /**
    * Get the encoded image as dataUrl
-   * @returns {string} the dataUrl of the image
+   * @returns the dataUrl of the image
    */
   public get imageAsDataUrl(): string {
     return this._imageAsDataUrl;
   }
 
   /**
-   * Extracts the Base64 data out of the given dataUrl.
-   * @param {string} dataUrl the given dataUrl
+   * Get the ImageData object associated with the canvas' 2d context.
+   * @returns the ImageData of the canvas's 2d context.
    */
-  private getDataFromDataUrl(dataUrl: string) {
-    return dataUrl.replace("data:" + this._mimeType + ";base64,", "");
+  public get imageData(): ImageData {
+    return this._imageData;
   }
+
 }
