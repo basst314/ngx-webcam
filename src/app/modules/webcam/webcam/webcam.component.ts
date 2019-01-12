@@ -51,10 +51,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /** MediaStream object in use for streaming UserMedia data */
   private mediaStream: MediaStream = null;
   @ViewChild('video') private video: any;
-  // Canvas for Video Snapshots
+  /** Canvas for Video Snapshots */
   @ViewChild('canvas') private canvas: any;
 
-  // width and height of the active video stream
+  /** width and height of the active video stream */
   private activeVideoSettings: MediaTrackSettings = null;
 
   /**
@@ -72,6 +72,13 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * If the given Observable emits, the active webcam will be switched to the one indicated by the emitted value.
+   * @param switchCamera Indicates which webcam to switch to
+   *   true: cycle forwards through available webcams
+   *   false: cycle backwards through available webcams
+   *   string: activate the webcam with the given id
+   */
   @Input()
   public set switchCamera(switchCamera: Observable<boolean | string>) {
     if (this.switchCameraSubscription) {
@@ -88,26 +95,6 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
         this.rotateVideoInput(value !== false);
       }
     });
-  }
-
-  public get videoWidth() {
-    const videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
-    return Math.min(this.width, this.height * videoRatio);
-  }
-
-  public get videoHeight() {
-    const videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
-    return Math.min(this.height, this.width / videoRatio);
-  }
-
-  public get videoStyleClasses() {
-    let classes: string = '';
-
-    if (this.isMirrorImage()) {
-      classes += 'mirrored ';
-    }
-
-    return classes.trim();
   }
 
   /**
@@ -262,6 +249,26 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     this.videoInitialized = false;
     this.stopMediaTracks();
     this.initWebcam(deviceId, this.videoOptions);
+  }
+
+  public get videoWidth() {
+    const videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
+    return Math.min(this.width, this.height * videoRatio);
+  }
+
+  public get videoHeight() {
+    const videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
+    return Math.min(this.height, this.width / videoRatio);
+  }
+
+  public get videoStyleClasses() {
+    let classes: string = '';
+
+    if (this.isMirrorImage()) {
+      classes += 'mirrored ';
+    }
+
+    return classes.trim();
   }
 
   /**

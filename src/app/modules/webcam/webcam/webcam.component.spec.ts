@@ -48,7 +48,11 @@ describe('WebcamComponent', () => {
     component.takeSnapshot();
 
     expect(base64).not.toBeNull();
+    expect(base64).not.toContain('data:');
+    expect(base64).not.toContain(';base64,');
     expect(dataUrl).not.toBeNull();
+    expect(dataUrl).toContain('data:');
+    expect(dataUrl).toContain(';base64,');
     expect(imageData).toBeNull();
   }));
 
@@ -69,7 +73,11 @@ describe('WebcamComponent', () => {
     component.takeSnapshot();
 
     expect(base64).not.toBeNull();
+    expect(base64).not.toContain('data:');
+    expect(base64).not.toContain(';base64,');
     expect(dataUrl).not.toBeNull();
+    expect(dataUrl).toContain('data:');
+    expect(dataUrl).toContain(';base64,');
     expect(imageData).not.toBeNull();
     expect(imageData.data).not.toBeNull();
   }));

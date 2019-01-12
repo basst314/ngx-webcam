@@ -18,7 +18,7 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 * Access to front- and back-camera, if multiple cameras exist
 * Portrait & Landscape mode on smartphones
 * Mirrored view for user-facing cameras, to enhance user experience (i.e. on smartphones)
-* Capturing ImageData object for post-processing.
+* Capturing of lossless pixel image data for better post-processing.
 
 
 ## Prerequisites
@@ -71,7 +71,7 @@ This section describes the basic inputs/outputs of the component. All inputs are
 * `mirrorImage: string | WebcamMirrorProperties`: Flag to control image mirroring. If the attribute is missing or `null` and a webcam claims to be user-facing, the image will be mirrored (x-axis) to provide a better user experience. A string value of `"never"` will prevent mirroring, whereas a value of `"always"` will mirror every webcam stream, even if the webcam cannot be detected as user-facing. For future extensions, the `WebcamMirrorProperties` object can also be used to set these values.
 * `allowCameraSwitch: boolean`: Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras are found.
 * `switchCamera: Observable<boolean|string>`: Can be used to cycle through available cameras (true=forward, false=backwards), or to switch to a specific device by deviceId (string).
-* `captureImageData: boolean = false`: Flag to enable/disable capturing the ImageData object and store it in the WebcamImage object.
+* `captureImageData: boolean = false`: Flag to enable/disable capturing of a lossless pixel ImageData object when a snapshot is taken. ImageData will be included in the emitted `WebcamImage` object.
 
 ### Outputs
 * `imageCapture: EventEmitter<WebcamImage>`: Whenever an image is captured (i.e. triggered by `[trigger]`), the image is emitted via this `EventEmitter`. The image data is contained in the `WebcamImage` data structure as both, plain Base64 string and data-url.
