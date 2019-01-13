@@ -12,6 +12,8 @@ import {WebcamMirrorProperties} from '../domain/webcam-mirror-properties';
 })
 export class WebcamComponent implements AfterViewInit, OnDestroy {
   private static DEFAULT_VIDEO_OPTIONS: MediaTrackConstraints = {facingMode: 'environment'};
+  private static DEFAULT_IMAGE_TYPE: string = 'image/jpeg';
+  private static DEFAULT_IMAGE_QUALITY: number = 0.92;
 
   /** Defines the max width of the webcam area in px */
   @Input() public width: number = 640;
@@ -25,6 +27,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Input() public mirrorImage: string | WebcamMirrorProperties;
   /** Flag to control whether an ImageData object is stored into the WebcamImage object. */
   @Input() public captureImageData: boolean = false;
+  /** The image type to use when capturing snapshots */
+  @Input() public imageType: string = WebcamComponent.DEFAULT_IMAGE_TYPE;
+  /** The image quality to use when capturing snapshots (number between 0 and 1) */
+  @Input() public imageQuality: number = WebcamComponent.DEFAULT_IMAGE_QUALITY;
 
   /** EventEmitter which fires when an image has been captured */
   @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
@@ -216,9 +222,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     context2d.drawImage(this.video.nativeElement, 0, 0);
 
     // read canvas content as image
-    // TODO allow mimeType options as Input()
-    const mimeType: string = 'image/jpeg';
-    const dataUrl: string = _canvas.toDataURL(mimeType);
+    const mimeType: string = this.imageType ? this.imageType : WebcamComponent.DEFAULT_IMAGE_TYPE;
+    const quality: number = this.imageQuality ? this.imageQuality : WebcamComponent.DEFAULT_IMAGE_QUALITY;
+    const dataUrl: string = _canvas.toDataURL(mimeType, quality);
 
     // get the ImageData object from the canvas' context.
     let imageData: ImageData = null;

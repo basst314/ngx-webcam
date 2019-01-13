@@ -72,6 +72,8 @@ This section describes the basic inputs/outputs of the component. All inputs are
 * `allowCameraSwitch: boolean`: Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras are found.
 * `switchCamera: Observable<boolean|string>`: Can be used to cycle through available cameras (true=forward, false=backwards), or to switch to a specific device by deviceId (string).
 * `captureImageData: boolean = false`: Flag to enable/disable capturing of a lossless pixel ImageData object when a snapshot is taken. ImageData will be included in the emitted `WebcamImage` object.
+* `imageType: string = 'image/jpeg'`: [Image type](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) to use when capturing snapshots. Default is 'image/jpeg'.
+* `imageQuality: number = 0.92`: [Image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) to use when capturing snapshots. Must be a number between 0..1. Default is 0.92.
 
 ### Outputs
 * `imageCapture: EventEmitter<WebcamImage>`: Whenever an image is captured (i.e. triggered by `[trigger]`), the image is emitted via this `EventEmitter`. The image data is contained in the `WebcamImage` data structure as both, plain Base64 string and data-url.
