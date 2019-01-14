@@ -257,13 +257,22 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     this.initWebcam(deviceId, this.videoOptions);
   }
 
+
+  /**
+   * Event-handler for video resize event.
+   * Triggers Angular change detection so that new video dimensions get applied
+   */
+  public videoResize(): void {
+    // here to trigger Angular change detection
+  }
+
   public get videoWidth() {
-    const videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
+    const videoRatio = this.getVideoAspectRatio();
     return Math.min(this.width, this.height * videoRatio);
   }
 
   public get videoHeight() {
-    const videoRatio = this.getVideoAspectRatio(this.activeVideoSettings);
+    const videoRatio = this.getVideoAspectRatio();
     return Math.min(this.height, this.width / videoRatio);
   }
 
@@ -278,24 +287,18 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * Return the video aspect ratio from the given mediaTrackSettings, if possible;
-   * Otherwise, calculate given the width/height parameters only
-   * @param mediaTrackSettings
+   * Returns the video aspect ratio of the active video stream
    */
-  private getVideoAspectRatio(mediaTrackSettings: MediaTrackSettings): number {
-    if (mediaTrackSettings) {
-      if (mediaTrackSettings.aspectRatio) {
-        // if ratio is present - use it
-        return mediaTrackSettings.aspectRatio;
+  private getVideoAspectRatio(): number {
+    // calculate ratio from video element dimensions if present
+    const videoElement = this.video.nativeElement;
+    if (videoElement.videoWidth && videoElement.videoWidth > 0 &&
+      videoElement.videoHeight && videoElement.videoHeight > 0) {
 
-      } else if (mediaTrackSettings.width && mediaTrackSettings.width > 0 &&
-        mediaTrackSettings.height && mediaTrackSettings.height > 0) {
-        // if width+height are present - calculate ratio
-        return mediaTrackSettings.width / mediaTrackSettings.height;
-      }
+      return videoElement.videoWidth / videoElement.videoHeight;
     }
 
-    // nothing present in mediaTrackSettings - calculate ratio based on width/height params
+    // nothing present - calculate ratio based on width/height params
     return this.width / this.height;
   }
 
@@ -365,7 +368,6 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     // default: enable mirroring if webcam is user facing
     return WebcamComponent.isUserFacing(this.getActiveVideoTrack());
   }
-
 
   /**
    * Stops all active media tracks.
