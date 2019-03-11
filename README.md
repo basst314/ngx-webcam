@@ -23,12 +23,12 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 
 ## Prerequisites
 
-###Runtime Dependencies
+### Runtime Dependencies
 * Angular: `^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0`
 * RxJs: `^5.0.0 || ^6.0.0`
 * App must be served on a secure context (https or localhost)
 
-###Client
+### Client
 * [Current Browser](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Browser_compatibility) w/ HTML5 and WebRTC/UserMedia support (Chrome >53, Safari >11, Firefox >38, Edge)
 * Webcam :)
 * User permissions to access the webcam
