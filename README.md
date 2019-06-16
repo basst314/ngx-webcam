@@ -24,7 +24,7 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 ## Prerequisites
 
 ### Runtime Dependencies
-* Angular: `^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0`
+* Angular: `^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0`
 * RxJs: `^5.0.0 || ^6.0.0`
 * App must be served on a secure context (https or localhost)
 
