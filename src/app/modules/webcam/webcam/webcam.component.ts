@@ -56,9 +56,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private switchCameraSubscription: Subscription;
   /** MediaStream object in use for streaming UserMedia data */
   private mediaStream: MediaStream = null;
-  @ViewChild('video') private video: any;
+  @ViewChild('video', { static: true }) private video: any;
   /** Canvas for Video Snapshots */
-  @ViewChild('canvas') private canvas: any;
+  @ViewChild('canvas', { static: true }) private canvas: any;
 
   /** width and height of the active video stream */
   private activeVideoSettings: MediaTrackSettings = null;
