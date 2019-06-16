@@ -45,6 +45,9 @@ export class AppComponent implements OnInit {
   }
 
   public handleInitError(error: WebcamInitError): void {
+    if (error.mediaStreamError && error.mediaStreamError.name === "NotAllowedError") {
+      console.warn("Camera access was not allowed by user!");
+    }
     this.errors.push(error);
   }
 
