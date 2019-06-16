@@ -206,7 +206,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    */
   public takeSnapshot(): void {
     // set canvas size to actual video size
-    const _video = this.video.nativeElement;
+    const _video = this.nativeVideoElement;
     const dimensions = {width: this.width, height: this.height};
     if (_video.videoWidth) {
       dimensions.width = _video.videoWidth;
@@ -219,7 +219,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
     // paint snapshot image to canvas
     const context2d = _canvas.getContext('2d');
-    context2d.drawImage(this.video.nativeElement, 0, 0);
+    context2d.drawImage(_video, 0, 0);
 
     // read canvas content as image
     const mimeType: string = this.imageType ? this.imageType : WebcamComponent.DEFAULT_IMAGE_TYPE;
@@ -286,12 +286,16 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     return classes.trim();
   }
 
+  public get nativeVideoElement() {
+    return this.video.nativeElement;
+  }
+
   /**
    * Returns the video aspect ratio of the active video stream
    */
   private getVideoAspectRatio(): number {
     // calculate ratio from video element dimensions if present
-    const videoElement = this.video.nativeElement;
+    const videoElement = this.nativeVideoElement;
     if (videoElement.videoWidth && videoElement.videoWidth > 0 &&
       videoElement.videoHeight && videoElement.videoHeight > 0) {
 
@@ -306,7 +310,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * Init webcam live view
    */
   private initWebcam(deviceId: string, userVideoTrackConstraints: MediaTrackConstraints) {
-    const _video = this.video.nativeElement;
+    const _video = this.nativeVideoElement;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
       // merge deviceId -> userVideoTrackConstraints
@@ -325,6 +329,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
           this.videoInitialized = true;
 
           this.cameraSwitched.next(activeDeviceId);
+
+          // Initial detect may run before user gave permissions, returning no deviceIds. This prevents later camera switches. (#47)
+          // Run detect once again within getUserMedia callback, to make sure this time we have permissions and get deviceIds.
+          this.detectAvailableDevices();
         })
         .catch((err: MediaStreamError) => {
           this.initError.next(<WebcamInitError>{message: err.message, mediaStreamError: err});
