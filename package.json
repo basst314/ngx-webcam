@@ -33,7 +33,10 @@
     "docs": "npm run build -- --base-href /ngx-webcam/ --output-path docs"
   },
   "private": false,
-  "peerDependencies": {},
+  "peerDependencies": {
+    "@angular/core": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0",
+    "rxjs": "^5.0.0 || ^6.0.0"
+  },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.800.3",
     "@angular/animations": "^8.0.1",
