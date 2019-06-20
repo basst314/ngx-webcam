@@ -4,7 +4,7 @@
   </h1>
 
   <div>
-    <webcam [height]="500" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
+    <webcam [height]="500" [width]="500" [trigger]="triggerObservable" [triggerStart]="triggerStartObservable" [triggerStop]="triggerStopObservable" [triggerPause]="triggerPauseObservable" (imageCapture)="handleImage($event)" (videoCapture)="handleVideo($event)" *ngIf="showWebcam"
             [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
             [videoOptions]="videoOptions"
             [imageQuality]="1"
@@ -13,6 +13,9 @@
     ></webcam>
     <br/>
     <button class="actionBtn" (click)="triggerSnapshot();">Take A Snapshot</button>
+    <button class="actionBtn" (click)="triggerStartSnapshot();">(Re)Start video</button>
+    <button class="actionBtn" (click)="triggerStopSnapshot();">Finish video</button>
+    <button class="actionBtn" (click)="triggerPauseSnapshot();">Pause / Resume video</button>
     <button class="actionBtn" (click)="toggleWebcam();">Toggle Webcam</button>
     <br/>
     <button class="actionBtn" (click)="showNextWebcam(true);" [disabled]="!multipleWebcamsAvailable">Next Webcam</button>
@@ -26,6 +29,16 @@
 <div class="snapshot" *ngIf="webcamImage">
   <h2>Nice one!</h2>
   <img [src]="webcamImage.imageAsDataUrl"/>
+</div>
+
+<div class="snapshot" *ngIf="videoBlob">
+  <h2>Nice one video!</h2>
+
+  <video style="width: 300px;">
+    <source [src]="videoBlob" type='video/webm; codecs="vp8, vorbis"' />
+  </video>
+  <br />
+  <a download [href]="videoBlob">test</a>
 </div>
 
 <h4 *ngIf="errors.length > 0">Messages:</h4>

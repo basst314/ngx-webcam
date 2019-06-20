@@ -23,7 +23,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/whammy/whammy.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -69,7 +71,9 @@
             "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [],
+            "scripts": [
+              "node_modules/whammy/whammy.js"
+            ],
             "styles": [
               "src/styles.scss"
             ],
