@@ -12,12 +12,12 @@ export class WebcamVideo {
     this._frameRate = frameRate;
     this._mimeType = mimeType;
     this._encoder = new Whammy.Video(this._frameRate);
-
   }
 
   private readonly _frameRate: number = 1;
   private readonly _mimeType: string = null;
   private readonly _encoder: any = null;
+  private _count: number = 0;
 
   /**
    * Get the base64 encoded video data
@@ -28,7 +28,9 @@ export class WebcamVideo {
       const blob = this._encoder.compile(false);
       const reader = new FileReader();
       reader.onload = (event: any) => {
-          success(event.target.result!); // event.target.results contains the base64 code to create the image.
+        success(
+          event.target.result.replace(`data:${this._mimeType};base64,`, '')
+        ); // event.target.results contains the base64 code to create the image.
       };
       reader.readAsDataURL(blob); // Convert the blob from clipboard to base64
     });
@@ -44,9 +46,14 @@ export class WebcamVideo {
 
   public addFrame(frame: CanvasRenderingContext2D) {
     this._encoder.add(frame);
+    this._count++;
   }
 
   public get frameRate(): number {
     return this._frameRate;
+  }
+
+  public get recordedFrames(): number {
+    return this._count;
   }
 }

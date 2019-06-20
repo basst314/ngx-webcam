@@ -81,4 +81,118 @@ describe('WebcamComponent', () => {
     expect(imageData).not.toBeNull();
     expect(imageData.data).not.toBeNull();
   }));
+
+  it('should take video and capture the VideoBlob object', async(() => {
+    const videoCapture$ = component.videoCapture.asObservable();
+
+    let frameRate: number = null;
+    let base64: Promise<string> = null;
+    let blob: Blob = null;
+    let recorded: number = 0;
+
+    videoCapture$
+      .subscribe(p => {
+        frameRate = p.frameRate;
+        base64 = p.videoAsBase64;
+        blob = p.videoAsBlob;
+        recorded = p.recordedFrames;
+      });
+    component.startRecording();
+    setTimeout(() => {
+      component.stopRecording();
+
+      expect(frameRate).not.toBeNull();
+      expect(frameRate).toBeGreaterThan(0);
+      expect(recorded).not.toBeNull();
+      expect(recorded).toBeGreaterThanOrEqual(frameRate);
+      expect(blob).not.toBeNull();
+      expect(blob.size).toBeGreaterThan(0);
+      expect(blob.type).toBe("video/webm");
+      base64.then((_) => {
+        expect(_).not.toBeNull();
+        expect(_).not.toContain('data:');
+        expect(_).not.toContain(';base64,');
+      })
+    }, 1000);
+  }));
+
+  it('should take video, stop video and take new video and capture the VideoBlob object', async(() => {
+    const videoCapture$ = component.videoCapture.asObservable();
+
+    let frameRate: number = null;
+    let base64: Promise<string> = null;
+    let blob: Blob = null;
+    let recorded: number = 0;
+
+    videoCapture$
+      .subscribe(p => {
+        frameRate = p.frameRate;
+        base64 = p.videoAsBase64;
+        blob = p.videoAsBlob;
+        recorded = p.recordedFrames;
+      });
+    component.startRecording();
+    setTimeout(() => {
+      component.stopRecording();
+      setTimeout(() => {
+        component.startRecording();
+        setTimeout(() => {
+          component.stopRecording();
+    
+          expect(frameRate).not.toBeNull();
+          expect(frameRate).toBeGreaterThan(0);
+          expect(recorded).not.toBeNull();
+          expect(recorded).toBe(frameRate);
+          expect(blob).not.toBeNull();
+          expect(blob.size).toBeGreaterThan(0);
+          expect(blob.type).toBe("video/webm");
+          base64.then((_) => {
+            expect(_).not.toBeNull();
+            expect(_).not.toContain('data:');
+            expect(_).not.toContain(';base64,');
+          })
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  }));
+
+  it('should take video, pause video and resume video and capture the VideoBlob object', async(() => {
+    const videoCapture$ = component.videoCapture.asObservable();
+
+    let frameRate: number = null;
+    let base64: Promise<string> = null;
+    let blob: Blob = null;
+    let recorded: number = 0;
+
+    videoCapture$
+      .subscribe(p => {
+        frameRate = p.frameRate;
+        base64 = p.videoAsBase64;
+        blob = p.videoAsBlob;
+        recorded = p.recordedFrames;
+      });
+    component.startRecording();
+    setTimeout(() => {
+      component.pauseRecording();
+      setTimeout(() => {
+        component.pauseRecording();
+        setTimeout(() => {
+          component.stopRecording();
+    
+          expect(frameRate).not.toBeNull();
+          expect(frameRate).toBeGreaterThan(0);
+          expect(recorded).not.toBeNull();
+          expect(recorded).toBe(2*frameRate);
+          expect(blob).not.toBeNull();
+          expect(blob.size).toBeGreaterThan(0);
+          expect(blob.type).toBe("video/webm");
+          base64.then((_) => {
+            expect(_).not.toBeNull();
+            expect(_).not.toContain('data:');
+            expect(_).not.toContain(';base64,');
+          })
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  }));
 });

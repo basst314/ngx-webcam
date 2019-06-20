@@ -12,7 +12,7 @@ import { WebcamVideo } from '../domain/webcam-video';
   styleUrls: ['./webcam.component.scss']
 })
 export class WebcamComponent implements AfterViewInit, OnDestroy {
-  private static DEFAULT_VIDEO_OPTIONS: MediaTrackConstraints = {facingMode: 'environment'};
+  private static DEFAULT_VIDEO_OPTIONS: MediaTrackConstraints = {facingMode: 'environment', frameRate: {ideal: 16}};
   private static DEFAULT_IMAGE_TYPE: string = 'image/jpeg';
   private static DEFAULT_FRAME_TYPE: string = 'image/webp';
   private static DEFAULT_IMAGE_QUALITY: number = 0.8;
@@ -41,7 +41,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
   /** EventEmitter which fires when an image has been captured */
   @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
-  /** EventEmitter which fires when an image has been captured */
+  /** EventEmitter which fires when a video has been captured */
   @Output() public videoCapture: EventEmitter<WebcamVideo> = new EventEmitter<WebcamVideo>();
   /** Emits a mediaError if webcam cannot be initialized (e.g. missing user permissions) */
   @Output() public initError: EventEmitter<WebcamInitError> = new EventEmitter<WebcamInitError>();
