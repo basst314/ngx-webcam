@@ -35,7 +35,8 @@
   "private": false,
   "peerDependencies": {
     "@angular/core": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0",
-    "rxjs": "^5.0.0 || ^6.0.0"
+    "rxjs": "^5.0.0 || ^6.0.0",
+    "whammy": "0.0.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.800.3",
@@ -72,9 +73,5 @@
     "tslint": "~5.17.0",
     "typescript": "^3.4.5",
     "zone.js": "~0.9.1"
-  },
-  "dependencies": {
-    "jquery": "^3.4.1",
-    "whammy": "0.0.1"
   }
 }
