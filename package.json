@@ -72,5 +72,9 @@
     "tslint": "~5.17.0",
     "typescript": "^3.4.5",
     "zone.js": "~0.9.1"
+  },
+  "dependencies": {
+    "jquery": "^3.4.1",
+    "whammy": "0.0.1"
   }
 }

@@ -4,16 +4,18 @@
  */
 export class WebcamImage {
 
-  public constructor(imageAsDataUrl: string, mimeType: string, imageData: ImageData) {
+  public constructor(imageAsDataUrl: string, mimeType: string, imageData: ImageData, context: CanvasRenderingContext2D) {
     this._mimeType = mimeType;
     this._imageAsDataUrl = imageAsDataUrl;
     this._imageData = imageData;
+    this._context = context;
   }
 
   private readonly _mimeType: string = null;
   private _imageAsBase64: string = null;
   private readonly _imageAsDataUrl: string = null;
   private readonly _imageData: ImageData = null;
+  private readonly _context: CanvasRenderingContext2D = null;
 
 
   /**
@@ -50,4 +52,7 @@ export class WebcamImage {
     return this._imageData;
   }
 
+  public get context(): CanvasRenderingContext2D{
+    return this._context;
+  }
 }

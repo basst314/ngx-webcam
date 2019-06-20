@@ -1,9 +1,10 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
 import {WebcamInitError} from '../domain/webcam-init-error';
 import {WebcamImage} from '../domain/webcam-image';
-import {Observable, Subscription} from 'rxjs';
+import {Observable, Subscription, timer, interval} from 'rxjs';
 import {WebcamUtil} from '../util/webcam.util';
 import {WebcamMirrorProperties} from '../domain/webcam-mirror-properties';
+import { WebcamVideo } from '../domain/webcam-video';
 
 @Component({
   selector: 'webcam',
@@ -13,7 +14,9 @@ import {WebcamMirrorProperties} from '../domain/webcam-mirror-properties';
 export class WebcamComponent implements AfterViewInit, OnDestroy {
   private static DEFAULT_VIDEO_OPTIONS: MediaTrackConstraints = {facingMode: 'environment'};
   private static DEFAULT_IMAGE_TYPE: string = 'image/jpeg';
-  private static DEFAULT_IMAGE_QUALITY: number = 0.92;
+  private static DEFAULT_FRAME_TYPE: string = 'image/webp';
+  private static DEFAULT_IMAGE_QUALITY: number = 0.8;
+  private static DEFAULT_FRAME_QUALITY: number = 0.8;
 
   /** Defines the max width of the webcam area in px */
   @Input() public width: number = 640;
@@ -29,11 +32,17 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Input() public captureImageData: boolean = false;
   /** The image type to use when capturing snapshots */
   @Input() public imageType: string = WebcamComponent.DEFAULT_IMAGE_TYPE;
+  /** The video frame type to use when recording video */
+  @Input() public frameType: string = WebcamComponent.DEFAULT_FRAME_TYPE;
   /** The image quality to use when capturing snapshots (number between 0 and 1) */
   @Input() public imageQuality: number = WebcamComponent.DEFAULT_IMAGE_QUALITY;
+  /** The image quality to use when capturing snapshots (number between 0 and 1) */
+  @Input() public frameQuality: number = WebcamComponent.DEFAULT_FRAME_QUALITY;
 
   /** EventEmitter which fires when an image has been captured */
   @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
+  /** EventEmitter which fires when an image has been captured */
+  @Output() public videoCapture: EventEmitter<WebcamVideo> = new EventEmitter<WebcamVideo>();
   /** Emits a mediaError if webcam cannot be initialized (e.g. missing user permissions) */
   @Output() public initError: EventEmitter<WebcamInitError> = new EventEmitter<WebcamInitError>();
   /** Emits when the webcam video was clicked */
@@ -46,10 +55,22 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
   /** Indicates whether the video device is ready to be switched */
   public videoInitialized: boolean = false;
+  /** Holds the instance of the currently recorded video */
+  public videoCaptured: WebcamVideo = undefined;
+  /** Holds the instance of the currently recorded video interval */
+  public videoCapturedTimeoutRef: any = undefined;
 
   /** If the Observable represented by this subscription emits, an image will be captured and emitted through
    * the 'imageCapture' EventEmitter */
   private triggerSubscription: Subscription;
+  /** If the Observable represented by this subscription emits, a video will be captured. Once stopped the video will be emitted through
+   * the 'videoCapture' EventEmitter */
+  private triggerStartSubscription: Subscription;
+  /** If the Observable represented by this subscription emits, the captured video will be finished and emitted through
+   * the 'videoCapture' EventEmitter */
+  private triggerStopSubscription: Subscription;
+  /** If the Observable represented by this subscription emits, the captured video will be paused */
+  private triggerPauseSubscription: Subscription;
   /** Index of active video in availableVideoInputs */
   private activeVideoInputIndex: number = -1;
   /** Subscription to switchCamera events */
@@ -75,6 +96,51 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     // Subscribe to events from this Observable to take snapshots
     this.triggerSubscription = trigger.subscribe(() => {
       this.takeSnapshot();
+    });
+  }
+
+  /**
+   * If the given Observable emits, a video will be captured. Once finished video will be emitted through 'videoCapture' EventEmitter
+   */
+  @Input()
+  public set triggerStart(trigger: Observable<void>) {
+    if (this.triggerStartSubscription) {
+      this.triggerStartSubscription.unsubscribe();
+    }
+
+    // Subscribe to events from this Observable to take snapshots
+    this.triggerStartSubscription = trigger.subscribe(() => {
+      this.startRecording();
+    });
+  }
+
+  /**
+   * If the given Observable emits, a video will be captured. Once finished video will be emitted through 'videoCapture' EventEmitter
+   */
+  @Input()
+  public set triggerStop(trigger: Observable<void>) {
+    if (this.triggerStopSubscription) {
+      this.triggerStopSubscription.unsubscribe();
+    }
+
+    // Subscribe to events from this Observable to take snapshots
+    this.triggerStopSubscription = trigger.subscribe(() => {
+      this.stopRecording();
+    });
+  }
+
+  /**
+   * If the given Observable emits, a video will be captured. Once finished video will be emitted through 'videoCapture' EventEmitter
+   */
+  @Input()
+  public set triggerPause(trigger: Observable<void>) {
+    if (this.triggerPauseSubscription) {
+      this.triggerPauseSubscription.unsubscribe();
+    }
+
+    // Subscribe to events from this Observable to take snapshots
+    this.triggerPauseSubscription = trigger.subscribe(() => {
+      this.pauseRecording();
     });
   }
 
@@ -201,39 +267,53 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     this.unsubscribeFromSubscriptions();
   }
 
+  public startRecording() {
+    const frameRate = typeof this.videoOptions.frameRate === 'number' ? this.videoOptions.frameRate : this.videoOptions.frameRate.ideal;
+
+    this.videoCaptured = new WebcamVideo(frameRate, 'video/webm');
+
+    this.takeFrames(0, frameRate);
+  }
+
+  public stopRecording() {
+    if(this.videoCapturedTimeoutRef) {
+      clearTimeout(this.videoCapturedTimeoutRef);
+      this.videoCapturedTimeoutRef = undefined;
+    }
+
+    if(this.videoCaptured) {
+      this.videoCapture.next(this.videoCaptured);
+    }
+  }
+
+  public pauseRecording() {
+    if(this.videoCapturedTimeoutRef) {
+      clearTimeout(this.videoCapturedTimeoutRef);
+      this.videoCapturedTimeoutRef = undefined;
+    } else {
+      this.takeFrames(0, this.videoCaptured.frameRate);
+    }
+  }
+
   /**
    * Takes a snapshot of the current webcam's view and emits the image as an event
    */
   public takeSnapshot(): void {
-    // set canvas size to actual video size
-    const _video = this.nativeVideoElement;
-    const dimensions = {width: this.width, height: this.height};
-    if (_video.videoWidth) {
-      dimensions.width = _video.videoWidth;
-      dimensions.height = _video.videoHeight;
-    }
-
-    const _canvas = this.canvas.nativeElement;
-    _canvas.width = dimensions.width;
-    _canvas.height = dimensions.height;
-
-    // paint snapshot image to canvas
-    const context2d = _canvas.getContext('2d');
-    context2d.drawImage(_video, 0, 0);
+    const canvas = this.take();
 
     // read canvas content as image
     const mimeType: string = this.imageType ? this.imageType : WebcamComponent.DEFAULT_IMAGE_TYPE;
     const quality: number = this.imageQuality ? this.imageQuality : WebcamComponent.DEFAULT_IMAGE_QUALITY;
-    const dataUrl: string = _canvas.toDataURL(mimeType, quality);
+    const dataUrl: string = canvas.getContext('2d').canvas.toDataURL(mimeType, quality);
 
     // get the ImageData object from the canvas' context.
     let imageData: ImageData = null;
 
     if (this.captureImageData) {
-      imageData = context2d.getImageData(0, 0, _canvas.width, _canvas.height);
+      imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
     }
 
-    this.imageCapture.next(new WebcamImage(dataUrl, mimeType, imageData));
+    this.imageCapture.next(new WebcamImage(dataUrl, mimeType, imageData, canvas.getContext('2d')));
   }
 
   /**
@@ -290,6 +370,23 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     return this.video.nativeElement;
   }
 
+  private takeFrames(delay, frameRate) {
+    this.videoCapturedTimeoutRef = setTimeout(() => {
+      const start = Date.now();
+      const canvas = this.take();
+
+      // get the ImageData object from the canvas' context.
+      let imageData: ImageData = null;
+  
+      if (this.captureImageData) {
+        imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+      }
+      this.videoCaptured.addFrame(canvas.getContext('2d'));
+
+      this.takeFrames(1000 / frameRate - (Date.now() - start), frameRate);
+    }, delay)
+  }
+
   /**
    * Returns the video aspect ratio of the active video stream
    */
@@ -304,6 +401,26 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
     // nothing present - calculate ratio based on width/height params
     return this.width / this.height;
+  }
+  
+  private take(): HTMLCanvasElement {
+    // set canvas size to actual video size
+    const _video = this.nativeVideoElement;
+    const dimensions = {width: this.width, height: this.height};
+    if (_video.videoWidth) {
+      dimensions.width = _video.videoWidth;
+      dimensions.height = _video.videoHeight;
+    }
+
+    const _canvas = this.canvas.nativeElement;
+    _canvas.width = dimensions.width;
+    _canvas.height = dimensions.height;
+
+    // paint snapshot image to canvas
+    const context2d = _canvas.getContext('2d');
+    context2d.drawImage(_video, 0, 0, _video.videoWidth, _video.videoHeight);
+    _canvas.toDataURL(this.frameType, this.frameQuality);
+    return _canvas;
   }
 
   /**
@@ -399,6 +516,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     }
     if (this.switchCameraSubscription) {
       this.switchCameraSubscription.unsubscribe();
+    }
+    if (this.videoCapturedTimeoutRef) {
+      clearTimeout(this.videoCapturedTimeoutRef);
     }
   }
 
