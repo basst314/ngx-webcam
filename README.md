@@ -58,6 +58,16 @@ export class AppModule { }
 
 `<webcam></webcam>`
 
+4) Optionally for WebM video captuing support you need to add this to your `angular.json`:
+
+```
+...
+"scripts": [
+  "node_modules/whammy/whammy.js"
+]
+...
+```
+
 As simple as that. 
 
 For more examples, see the code in the <a href="https://github.com/basst314/ngx-webcam-demo" target="_blank">Demo-Project</a>.
