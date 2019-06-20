@@ -83,15 +83,14 @@ This section describes the basic inputs/outputs of the component. All inputs are
 
 ## Good To Know
 ### How to determine if the user denied camera access
-When camera initialization fails for some reason, the component emits a `WebcamInitError` via the `initError` EventEmitter. If provided by the browser, this object contains a field `mediaStreamError: MediaStreamError` which contains information about why UserMedia initialization failed. According to [Mozilla API docs](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia), this object contains a `name` attribute with gives insight about the reason.
+When camera initialization fails for some reason, the component emits a `WebcamInitError` via the `initError` EventEmitter. If provided by the browser, this object contains a field `mediaStreamError: MediaStreamError` which contains information about why UserMedia initialization failed. According to [Mozilla API docs](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia), this object contains a `name` attribute which gives insight about the reason.
 > If the user denies permission, or matching media is not available, then the promise is rejected with NotAllowedError or NotFoundError respectively.
 
 In case a user denied permissions this can be determined like this:
 ```
   <webcam (initError)="handleInitError($event)"></webcam>
-
----
-
+```
+```
   public handleInitError(error: WebcamInitError): void {
     if (error.mediaStreamError && error.mediaStreamError.name === "NotAllowedError") {
       console.warn("Camera access was not allowed by user!");
