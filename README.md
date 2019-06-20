@@ -14,6 +14,7 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 ## Features
 * Webcam live view
 * Photo capturing
+* Video capturing ((Re)Play, Finish, Pause / Resume Function)
 * Smartphone compatibility for modern OS's (OS must support WebRTC/UserMedia API)
 * Access to front- and back-camera, if multiple cameras exist
 * Portrait & Landscape mode on smartphones
@@ -65,18 +66,25 @@ For more examples, see the code in the <a href="https://github.com/basst314/ngx-
 This section describes the basic inputs/outputs of the component. All inputs are optional.
 ### Inputs
 * `trigger: Observable<void>`: An `Observable` to trigger image capturing. When it fires, an image will be captured and emitted (see Outputs).
+* `triggerStart: Observable<void>`: An `Observable` to trigger video capturing. When it fires, a video will be captured any captured video will be removed.
+* `triggerStop: Observable<void>`: An `Observable` to trigger video finish. When it fires, the started video will be finished and emitted (see Outputs).
+* `triggerPause: Observable<void>`: An `Observable` to trigger pausing / resuming video capturing. When it fires, the video will be put on hold or resumed.
 * `width: number`: The maximal video width of the webcam live view.
 * `height: number`: The maximal video height of the webcam live view. The actual view will be placed within these boundaries, respecting the aspect ratio of the video stream.
-* `videoOptions: MediaTrackConstraints`: Defines constraints ([MediaTrackConstraints](https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints)) to apply when requesting the video track.
+* `videoOptions: MediaTrackConstraints`: Defines constraints ([MediaTrackConstraints](https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints)) to apply when requesting the video track. 
+Note: You can request a framerate (default : 16 fps) here which will be tried to reach. Since rendering takes some time the requested framerate is possibly not reached on some devices.
 * `mirrorImage: string | WebcamMirrorProperties`: Flag to control image mirroring. If the attribute is missing or `null` and a webcam claims to be user-facing, the image will be mirrored (x-axis) to provide a better user experience. A string value of `"never"` will prevent mirroring, whereas a value of `"always"` will mirror every webcam stream, even if the webcam cannot be detected as user-facing. For future extensions, the `WebcamMirrorProperties` object can also be used to set these values.
 * `allowCameraSwitch: boolean`: Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras are found.
 * `switchCamera: Observable<boolean|string>`: Can be used to cycle through available cameras (true=forward, false=backwards), or to switch to a specific device by deviceId (string).
 * `captureImageData: boolean = false`: Flag to enable/disable capturing of a lossless pixel ImageData object when a snapshot is taken. ImageData will be included in the emitted `WebcamImage` object.
 * `imageType: string = 'image/jpeg'`: [Image type](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) to use when capturing snapshots. Default is 'image/jpeg'.
+* `frameType: string = 'image/webp'`: [Image type](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) to use when capturing video frames. Default is 'image/webp' (only supported currently).
 * `imageQuality: number = 0.92`: [Image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) to use when capturing snapshots. Must be a number between 0..1. Default is 0.92.
+* `frameQuality: number = 0.92`: [Image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) to use when capturing video frames. Must be a number between 0..1. Default is 0.92.
 
 ### Outputs
 * `imageCapture: EventEmitter<WebcamImage>`: Whenever an image is captured (i.e. triggered by `[trigger]`), the image is emitted via this `EventEmitter`. The image data is contained in the `WebcamImage` data structure as both, plain Base64 string and data-url.
+* `videoCapture: EventEmitter<WebcamVideo>`: Whenever a video is captured (i.e. triggered by `[triggerStop]`), the video is emitted via this `EventEmitter`. The video data is contained in the `WebcamVideo` data structure as both, plain Base64 string and Blob.
 * `imageClick: EventEmitter<void>`: An `EventEmitter` to signal clicks on the webcam area.
 * `initError: EventEmitter<WebcamInitError>`: An `EventEmitter` to signal errors during the webcam initialization.
 * `cameraSwitched: EventEmitter<string>`: Emits the active deviceId after the active video device has been switched.

@@ -15,8 +15,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private static DEFAULT_VIDEO_OPTIONS: MediaTrackConstraints = {facingMode: 'environment', frameRate: {ideal: 16}};
   private static DEFAULT_IMAGE_TYPE: string = 'image/jpeg';
   private static DEFAULT_FRAME_TYPE: string = 'image/webp';
-  private static DEFAULT_IMAGE_QUALITY: number = 0.8;
-  private static DEFAULT_FRAME_QUALITY: number = 0.8;
+  private static DEFAULT_IMAGE_QUALITY: number = 0.92;
+  private static DEFAULT_FRAME_QUALITY: number = 0.92;
 
   /** Defines the max width of the webcam area in px */
   @Input() public width: number = 640;

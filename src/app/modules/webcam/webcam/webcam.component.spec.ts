@@ -104,7 +104,7 @@ describe('WebcamComponent', () => {
       expect(frameRate).not.toBeNull();
       expect(frameRate).toBeGreaterThan(0);
       expect(recorded).not.toBeNull();
-      expect(recorded).toBeGreaterThanOrEqual(frameRate);
+      expect(recorded).toBeCloseTo(frameRate);
       expect(blob).not.toBeNull();
       expect(blob.size).toBeGreaterThan(0);
       expect(blob.type).toBe("video/webm");
@@ -138,11 +138,11 @@ describe('WebcamComponent', () => {
         component.startRecording();
         setTimeout(() => {
           component.stopRecording();
-    
+
           expect(frameRate).not.toBeNull();
           expect(frameRate).toBeGreaterThan(0);
           expect(recorded).not.toBeNull();
-          expect(recorded).toBe(frameRate);
+          expect(recorded).toBeCloseTo(frameRate);
           expect(blob).not.toBeNull();
           expect(blob.size).toBeGreaterThan(0);
           expect(blob.type).toBe("video/webm");
@@ -178,11 +178,11 @@ describe('WebcamComponent', () => {
         component.pauseRecording();
         setTimeout(() => {
           component.stopRecording();
-    
+
           expect(frameRate).not.toBeNull();
           expect(frameRate).toBeGreaterThan(0);
           expect(recorded).not.toBeNull();
-          expect(recorded).toBe(2*frameRate);
+          expect(recorded).toBeCloseTo(2 * frameRate);
           expect(blob).not.toBeNull();
           expect(blob.size).toBeGreaterThan(0);
           expect(blob.type).toBe("video/webm");
