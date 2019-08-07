@@ -31,6 +31,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Input() public imageType: string = WebcamComponent.DEFAULT_IMAGE_TYPE;
   /** The image quality to use when capturing snapshots (number between 0 and 1) */
   @Input() public imageQuality: number = WebcamComponent.DEFAULT_IMAGE_QUALITY;
+  /** The prefer start rear camera or front camera */
+  @Input() public preferCamera: 'rear' | 'front' | string;
 
   /** EventEmitter which fires when an image has been captured */
   @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
@@ -56,9 +58,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private switchCameraSubscription: Subscription;
   /** MediaStream object in use for streaming UserMedia data */
   private mediaStream: MediaStream = null;
-  @ViewChild('video', { static: true }) private video: any;
+  @ViewChild('video', {static: true}) private video: any;
   /** Canvas for Video Snapshots */
-  @ViewChild('canvas', { static: true }) private canvas: any;
+  @ViewChild('canvas', {static: true}) private canvas: any;
 
   /** width and height of the active video stream */
   private activeVideoSettings: MediaTrackSettings = null;
@@ -186,8 +188,15 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   public ngAfterViewInit(): void {
     this.detectAvailableDevices()
       .then((devices: MediaDeviceInfo[]) => {
-        // start first device
-        this.switchToVideoInput(devices.length > 0 ? devices[0].deviceId : null);
+        if (this.preferCamera) {
+          const cameraLabel = this.preferCamera === 'rear' ? 'back' : 'front';
+          const preferCamera = devices.find(device => device.label.indexOf(cameraLabel) > 0);
+          const preferCameraID = preferCamera ? preferCamera.deviceId : devices.length > 0 ? devices[0].deviceId : null;
+          this.switchToVideoInput(preferCameraID);
+        } else {
+          // start first device
+          this.switchToVideoInput(devices.length > 0 ? devices[0].deviceId : null);
+        }
       })
       .catch((err: string) => {
         this.initError.next(<WebcamInitError>{message: err});
