@@ -15,10 +15,7 @@ export class AppComponent implements OnInit {
   public allowCameraSwitch = true;
   public multipleWebcamsAvailable = false;
   public deviceId: string;
-  public videoOptions: MediaTrackConstraints = {
-    // width: {ideal: 1024},
-    // height: {ideal: 576}
-  };
+  public facingMode: string = 'environment';
   public errors: WebcamInitError[] = [];
 
   // latest snapshot
@@ -74,5 +71,14 @@ export class AppComponent implements OnInit {
 
   public get nextWebcamObservable(): Observable<boolean|string> {
     return this.nextWebcam.asObservable();
+  }
+
+  public get videoOptions(): MediaTrackConstraints {
+    const result: MediaTrackConstraints = {};
+    if (this.facingMode && this.facingMode !== "") {
+      result.facingMode = { ideal: this.facingMode };
+    }
+
+    return result;
   }
 }

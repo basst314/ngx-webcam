@@ -20,6 +20,11 @@
     <br/>
     DeviceId: <input id="deviceId" type="text" [(ngModel)]="deviceId" style="width: 500px">
     <button (click)="showNextWebcam(deviceId);">Activate</button>
+    <br/>
+    Preferred facing mode:
+    <input type="radio" value="user" name="facingMode" [(ngModel)]="facingMode"> User
+    <input type="radio" value="environment" name="facingMode" [(ngModel)]="facingMode"> Environment
+    <input type="radio" value="" name="facingMode" [(ngModel)]="facingMode"> No preference
   </div>
 </div>
 

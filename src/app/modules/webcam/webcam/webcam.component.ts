@@ -185,9 +185,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
   public ngAfterViewInit(): void {
     this.detectAvailableDevices()
-      .then((devices: MediaDeviceInfo[]) => {
-        // start first device
-        this.switchToVideoInput(devices.length > 0 ? devices[0].deviceId : null);
+      .then(() => {
+        // start video
+        this.switchToVideoInput(null);
       })
       .catch((err: string) => {
         this.initError.next(<WebcamInitError>{message: err});
@@ -324,15 +324,21 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
           this.activeVideoSettings = stream.getVideoTracks()[0].getSettings();
           const activeDeviceId: string = WebcamComponent.getDeviceIdFromMediaStreamTrack(stream.getVideoTracks()[0]);
-          this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
-            .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
-          this.videoInitialized = true;
 
           this.cameraSwitched.next(activeDeviceId);
 
           // Initial detect may run before user gave permissions, returning no deviceIds. This prevents later camera switches. (#47)
           // Run detect once again within getUserMedia callback, to make sure this time we have permissions and get deviceIds.
-          this.detectAvailableDevices();
+          this.detectAvailableDevices()
+            .then(() => {
+              this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
+                .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
+              this.videoInitialized = true;
+            })
+            .catch(() => {
+              this.activeVideoInputIndex = -1;
+              this.videoInitialized = true;
+            });
         })
         .catch((err: MediaStreamError) => {
           this.initError.next(<WebcamInitError>{message: err.message, mediaStreamError: err});
