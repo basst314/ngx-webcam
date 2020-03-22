@@ -42,8 +42,8 @@ export class AppComponent implements OnInit {
   }
 
   public handleInitError(error: WebcamInitError): void {
-    if (error.mediaStreamError && error.mediaStreamError.name === "NotAllowedError") {
-      console.warn("Camera access was not allowed by user!");
+    if (error.mediaStreamError && error.mediaStreamError.name === 'NotAllowedError') {
+      console.warn('Camera access was not allowed by user!');
     }
     this.errors.push(error);
   }
@@ -75,7 +75,7 @@ export class AppComponent implements OnInit {
 
   public get videoOptions(): MediaTrackConstraints {
     const result: MediaTrackConstraints = {};
-    if (this.facingMode && this.facingMode !== "") {
+    if (this.facingMode && this.facingMode !== '') {
       result.facingMode = { ideal: this.facingMode };
     }
 
