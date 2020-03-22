@@ -24,6 +24,7 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 ## Prerequisites
 
 ### Runtime Dependencies
+**Note:** Starting from version `0.3.0` this project requires TypeScript `>= 3.7.0` (Angular 9). For older versions of Angular/TypeScript, please use version `0.2.6` of this library.
 * Angular: `>=9.0.0`
 * Typescript: `>=3.7.0`
 * RxJs: `>=5.0.0`
