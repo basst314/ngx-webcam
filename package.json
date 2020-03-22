@@ -14,11 +14,6 @@
     "Webcam",
     "Camera",
     "Angular",
-    "Angular 4",
-    "Angular 5",
-    "Angular 6",
-    "Angular 7",
-    "Angular 8",
     "Angular 9",
     "Smartphone",
     "Phone",
@@ -36,7 +31,7 @@
   },
   "private": false,
   "peerDependencies": {
-    "@angular/core": ">=4.0.0",
+    "@angular/core": ">=9.0.0",
     "rxjs": ">=5.0.0"
   },
   "devDependencies": {
@@ -64,6 +59,7 @@
     "karma-coverage-istanbul-reporter": "~2.1.0",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
+    "ng-packagr": "^9.0.3",
     "protractor": "~5.4.3",
     "rxjs": "^6.5.4",
     "ts-node": "~8.3.0",
