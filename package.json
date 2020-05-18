@@ -27,8 +27,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "packagr": "ng-packagr -p ng-package.json",
-    "docs": "npm run build -- --base-href /ngx-webcam/ --output-path docs",
-    "postinstall": "webdriver-manager update"
+    "docs": "npm run build -- --base-href /ngx-webcam/ --output-path docs"
   },
   "private": false,
   "peerDependencies": {
