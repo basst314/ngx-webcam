@@ -27,7 +27,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "packagr": "ng-packagr -p ng-package.json",
-    "docs": "npm run build -- --base-href /ngx-webcam/ --output-path docs"
+    "docs": "npm run build -- --base-href /ngx-webcam/ --output-path docs",
+    "postinstall": "webdriver-manager update"
   },
   "private": false,
   "peerDependencies": {
@@ -60,7 +61,7 @@
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
     "ng-packagr": "^9.0.3",
-    "protractor": "~5.4.3",
+    "protractor": "^5.4.4",
     "rxjs": "^6.5.4",
     "ts-node": "~8.3.0",
     "tslib": "^1.10.0",
