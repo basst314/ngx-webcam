@@ -7,6 +7,9 @@ node_js:
 
 addons:
   chrome: stable
+  apt:
+    packages:
+      - dpkg # to fix issue described here: https://github.com/travis-ci/travis-ci/issues/9361
 
 cache:
   directories:
@@ -14,6 +17,11 @@ cache:
 
 install:
   - npm install
+
+before_script:
+  - LATEST_CHROMEDRIVER_VERSION=`curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE`
+  - curl https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip -O
+  - unzip chromedriver_linux64.zip -d ~/bin
 
 script:
 - npm run packagr
