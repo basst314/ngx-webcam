@@ -40,6 +40,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Output() public imageClick: EventEmitter<void> = new EventEmitter<void>();
   /** Emits the active deviceId after the active video device was switched */
   @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<string>();
+  /** Emits device info of the active device to get kind, label, and MediaTrackCapabilities of the device **/
+  @Output() videoDeviceInfo: EventEmitter<InputDeviceInfo> = new EventEmitter();
 
   /** available video devices */
   public availableVideoInputs: InputDeviceInfo[] = [];
@@ -334,10 +336,12 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
               this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
                 .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
               this.videoInitialized = true;
+              this.videoDeviceInfo.next(this.availableVideoInputs[this.activeVideoInputIndex]);
             })
             .catch(() => {
               this.activeVideoInputIndex = -1;
               this.videoInitialized = true;
+              this.videoDeviceInfo.next(undefined);
             });
         })
         .catch((err: MediaStreamError) => {
