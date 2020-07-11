@@ -42,7 +42,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<string>();
 
   /** available video devices */
-  public availableVideoInputs: MediaDeviceInfo[] = [];
+  public availableVideoInputs: InputDeviceInfo[] = [];
 
   /** Indicates whether the video device is ready to be switched */
   public videoInitialized: boolean = false;
@@ -411,10 +411,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /**
    * Reads available input devices
    */
-  private detectAvailableDevices(): Promise<MediaDeviceInfo[]> {
+  private detectAvailableDevices(): Promise<InputDeviceInfo[]> {
     return new Promise((resolve, reject) => {
       WebcamUtil.getAvailableVideoInputs()
-        .then((devices: MediaDeviceInfo[]) => {
+        .then((devices: InputDeviceInfo[]) => {
           this.availableVideoInputs = devices;
           resolve(devices);
         })
