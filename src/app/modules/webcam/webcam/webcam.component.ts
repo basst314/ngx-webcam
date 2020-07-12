@@ -41,7 +41,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /** Emits the active deviceId after the active video device was switched */
   @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<string>();
   /** Emits device info of the active device to get kind, label, and MediaTrackCapabilities of the device **/
-  @Output() videoDeviceInfo: EventEmitter<InputDeviceInfo> = new EventEmitter();
+  @Output() public videoDeviceInfo: EventEmitter<InputDeviceInfo> = new EventEmitter();
 
   /** available video devices */
   public availableVideoInputs: InputDeviceInfo[] = [];
