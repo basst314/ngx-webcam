@@ -1,8 +1,8 @@
-# Ngx-Webcam [![npm version](https://badge.fury.io/js/ngx-webcam.svg)](https://badge.fury.io/js/ngx-webcam) [![Build Status](https://travis-ci.org/basst314/ngx-webcam.svg?branch=master)](https://travis-ci.org/basst314/ngx-webcam)
+# ngx-webcam [![npm version](https://badge.fury.io/js/ngx-webcam.svg)](https://badge.fury.io/js/ngx-webcam) [![Build Status](https://travis-ci.org/basst314/ngx-webcam.svg?branch=master)](https://travis-ci.org/basst314/ngx-webcam)
 
-A simple Angular 4+ Webcam-Component. Pure &amp; minimal, no Flash-Fallback. <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">See the Demo!</a>
+A simple Angular webcam component. Pure &amp; minimal, no Flash-fallback. <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">See the Demo!</a>
 
-**Plug-and-play.** This library contains a single webcam-module which can be imported into nearly every Angular 4+ project.
+**Plug-and-play.** This library contains a single module which can be imported into every standard Angular 9+ project.
 
 **Simple to use.** The one component gives you full control and lets you take snapshots via actions and event bindings.
 
@@ -14,24 +14,26 @@ Try out the <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">Li
 ## Features
 * Webcam live view
 * Photo capturing
-* Smartphone compatibility for modern OS's (OS must support WebRTC/UserMedia API)
+* Smartphone compatibility for modern OS's (OS must support [WebRTC/UserMedia API](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices))
 * Access to front- and back-camera, if multiple cameras exist
 * Portrait & Landscape mode on smartphones
-* Mirrored view for user-facing cameras, to enhance user experience (i.e. on smartphones)
+* Mirrored live-view for user-facing cameras - "selfie view" on phones
 * Capturing of lossless pixel image data for better post-processing.
 
 
 ## Prerequisites
 
 ### Runtime Dependencies
-* Angular: `^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0`
-* RxJs: `^5.0.0 || ^6.0.0`
-* App must be served on a secure context (https or localhost)
+**Note:** Starting from version `0.3.0` this project requires TypeScript `>= 3.7.0` (Angular 9). For older versions of Angular/TypeScript, please use version `0.2.6` of this library.
+* Angular: `>=9.0.0`
+* Typescript: `>=3.7.0`
+* RxJs: `>=5.0.0`
+* **Important:** Your app must be served on a secure context using `https://` or on localhost, for modern browsers to permit WebRTC/UserMedia access.
 
 ### Client
-* [Current Browser](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Browser_compatibility) w/ HTML5 and WebRTC/UserMedia support (Chrome >53, Safari >11, Firefox >38, Edge)
-* Webcam :)
-* User permissions to access the webcam
+* [Current browser](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Browser_compatibility) w/ HTML5 and WebRTC/UserMedia support (Chrome >53, Safari >11, Firefox >38, Edge)
+* Webcam / camera
+* User permissions to access the camera
 
 ## Usage
 1) Install the library via standard npm command:
@@ -68,7 +70,7 @@ This section describes the basic inputs/outputs of the component. All inputs are
 * `width: number`: The maximal video width of the webcam live view.
 * `height: number`: The maximal video height of the webcam live view. The actual view will be placed within these boundaries, respecting the aspect ratio of the video stream.
 * `videoOptions: MediaTrackConstraints`: Defines constraints ([MediaTrackConstraints](https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints)) to apply when requesting the video track.
-* `mirrorImage: string | WebcamMirrorProperties`: Flag to control image mirroring. If the attribute is missing or `null` and a webcam claims to be user-facing, the image will be mirrored (x-axis) to provide a better user experience. A string value of `"never"` will prevent mirroring, whereas a value of `"always"` will mirror every webcam stream, even if the webcam cannot be detected as user-facing. For future extensions, the `WebcamMirrorProperties` object can also be used to set these values.
+* `mirrorImage: string | WebcamMirrorProperties`: Flag to control image mirroring. If the attribute is missing or `null` and the camera claims to be user-facing, the image will be mirrored (x-axis) to provide a better user experience ("selfie view"). A string value of `"never"` will prevent mirroring, whereas a value of `"always"` will mirror every camera stream, even if the camera cannot be detected as user-facing. For future extensions, the `WebcamMirrorProperties` object can also be used to set these values.
 * `allowCameraSwitch: boolean`: Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras are found.
 * `switchCamera: Observable<boolean|string>`: Can be used to cycle through available cameras (true=forward, false=backwards), or to switch to a specific device by deviceId (string).
 * `captureImageData: boolean = false`: Flag to enable/disable capturing of a lossless pixel ImageData object when a snapshot is taken. ImageData will be included in the emitted `WebcamImage` object.
@@ -81,6 +83,23 @@ This section describes the basic inputs/outputs of the component. All inputs are
 * `initError: EventEmitter<WebcamInitError>`: An `EventEmitter` to signal errors during the webcam initialization.
 * `cameraSwitched: EventEmitter<string>`: Emits the active deviceId after the active video device has been switched.
 
+## Good To Know
+### How to determine if a user has denied camera access
+When camera initialization fails for some reason, the component emits a `WebcamInitError` via the `initError` EventEmitter. If provided by the browser, this object contains a field `mediaStreamError: MediaStreamError` which contains information about why UserMedia initialization failed. According to [Mozilla API docs](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia), this object contains a `name` attribute which gives insight about the reason.
+> If the user denies permission, or matching media is not available, then the promise is rejected with NotAllowedError or NotFoundError respectively.
+
+Determine if a user has denied permissions:
+```
+  <webcam (initError)="handleInitError($event)"></webcam>
+```
+```
+  public handleInitError(error: WebcamInitError): void {
+    if (error.mediaStreamError && error.mediaStreamError.name === "NotAllowedError") {
+      console.warn("Camera access was not allowed by user!");
+    }
+  }
+```
+
 ## Development
 Here you can find instructions on how to start developing this library.
 
@@ -88,7 +107,7 @@ Here you can find instructions on how to start developing this library.
 Run `npm run packagr` to build the library. The build artifacts will be stored in the `dist/` directory.
 
 ### Start
-Run `npm start` to build and run the surrounding webapp with the `WebcamModule`. Essential for live-developing.
+Run `npm start` to build and run the surrounding demo app with the `WebcamModule`. Essential for live-developing.
 
 ### Generate docs/
 Run `npm run docs` to generate the live-demo documentation pages in the `docs/` directory.
