@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {WebcamComponent} from './webcam.component';
 
@@ -7,7 +7,7 @@ describe('WebcamComponent', () => {
   let component: WebcamComponent;
   let fixture: ComponentFixture<WebcamComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [WebcamComponent]
     })
@@ -23,16 +23,16 @@ describe('WebcamComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  it('should render a video tag', async(() => {
+  it('should render a video tag', waitForAsync(() => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('video')).toBeTruthy();
   }));
-  it('should render a canvas tag', async(() => {
+  it('should render a canvas tag', waitForAsync(() => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('canvas')).toBeTruthy();
   }));
 
-  it('should take snapshot without capturing the WebcamImage object', async(() => {
+  it('should take snapshot without capturing the WebcamImage object', waitForAsync(() => {
     const imageCapture$ = component.imageCapture.asObservable();
 
     let base64: string = null;
@@ -56,7 +56,7 @@ describe('WebcamComponent', () => {
     expect(imageData).toBeNull();
   }));
 
-  it('should take snapshot and capture the WebcamImage object', async(() => {
+  it('should take snapshot and capture the WebcamImage object', waitForAsync(() => {
     component.captureImageData = true;
     const imageCapture$ = component.imageCapture.asObservable();
 
