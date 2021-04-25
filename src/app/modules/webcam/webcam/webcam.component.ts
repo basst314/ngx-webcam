@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
 import {WebcamInitError} from '../domain/webcam-init-error';
 import {WebcamImage} from '../domain/webcam-image';
 import {Observable, Subscription} from 'rxjs';
@@ -56,9 +56,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private switchCameraSubscription: Subscription;
   /** MediaStream object in use for streaming UserMedia data */
   private mediaStream: MediaStream = null;
-  @ViewChild('video', { static: true }) private video: any;
+  @ViewChild('video', { static: true }) private video: ElementRef<HTMLVideoElement>;
   /** Canvas for Video Snapshots */
-  @ViewChild('canvas', { static: true }) private canvas: any;
+  @ViewChild('canvas', { static: true }) private canvas: ElementRef<HTMLCanvasElement>;
 
   /** width and height of the active video stream */
   private activeVideoSettings: MediaTrackSettings = null;
