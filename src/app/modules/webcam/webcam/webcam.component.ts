@@ -31,6 +31,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Input() public imageType: string = WebcamComponent.DEFAULT_IMAGE_TYPE;
   /** The image quality to use when capturing snapshots (number between 0 and 1) */
   @Input() public imageQuality: number = WebcamComponent.DEFAULT_IMAGE_QUALITY;
+  /** Flag to enable/disable resolution label. */
+  @Input() public showResolution: boolean = false;
 
   /** EventEmitter which fires when an image has been captured */
   @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
@@ -206,6 +208,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    */
   public takeSnapshot(): void {
     // set canvas size to actual video size
+    const track = this.getActiveVideoTrack();
+    const capabilities = track.getCapabilities();
+
     const _video = this.nativeVideoElement;
     const dimensions = {width: this.width, height: this.height};
     if (_video.videoWidth) {

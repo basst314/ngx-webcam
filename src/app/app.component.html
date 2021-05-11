@@ -10,6 +10,7 @@
             [imageQuality]="1"
             (cameraSwitched)="cameraWasSwitched($event)"
             (initError)="handleInitError($event)"
+            [showResolution]="true"
     ></webcam>
     <br/>
     <button class="actionBtn" (click)="triggerSnapshot();">Take A Snapshot</button>
