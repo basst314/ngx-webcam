@@ -1,22 +1,26 @@
 export class WebcamUtil {
 
+  private static availableVideoInputs: MediaDeviceInfo[] = [];
+
+  static hasVideoInputs() {
+    const inputs = WebcamUtil.availableVideoInputs;
+    return !!inputs.find(input => !!input.deviceId);
+  }
+
   /**
    * Lists available videoInput devices
    * @returns a list of media device info.
    */
-  public static getAvailableVideoInputs(): Promise<MediaDeviceInfo[]> {
+  public static async getAvailableVideoInputs(): Promise<MediaDeviceInfo[]> {
     if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-      return Promise.reject('enumerateDevices() not supported.');
+      throw new Error('enumerateDevices() not supported.');
     }
 
-    return new Promise((resolve, reject) => {
-      navigator.mediaDevices.enumerateDevices()
-        .then((devices: MediaDeviceInfo[]) => {
-          resolve(devices.filter((device: MediaDeviceInfo) => device.kind === 'videoinput'));
-        })
-        .catch(err => {
-          reject(err.message || err);
-        });
-    });
+    if (!this.hasVideoInputs()) {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      WebcamUtil.availableVideoInputs = devices.filter((device: MediaDeviceInfo) => device.kind === 'videoinput');
+    }
+
+    return WebcamUtil.availableVideoInputs;
   }
 }
