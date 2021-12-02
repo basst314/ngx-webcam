@@ -1,18 +1,28 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
-import {WebcamInitError} from '../domain/webcam-init-error';
-import {WebcamImage} from '../domain/webcam-image';
-import {Observable, Subscription} from 'rxjs';
-import {WebcamUtil} from '../util/webcam.util';
-import {WebcamMirrorProperties} from '../domain/webcam-mirror-properties';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  Output,
+  ViewChild,
+} from "@angular/core";
+import { WebcamInitError } from "../domain/webcam-init-error";
+import { WebcamImage } from "../domain/webcam-image";
+import { Observable, Subscription } from "rxjs";
+import { WebcamUtil } from "../util/webcam.util";
+import { WebcamMirrorProperties } from "../domain/webcam-mirror-properties";
 
 @Component({
-  selector: 'webcam',
-  templateUrl: './webcam.component.html',
-  styleUrls: ['./webcam.component.scss']
+  selector: "webcam",
+  templateUrl: "./webcam.component.html",
+  styleUrls: ["./webcam.component.scss"],
 })
 export class WebcamComponent implements AfterViewInit, OnDestroy {
-  private static DEFAULT_VIDEO_OPTIONS: MediaTrackConstraints = {facingMode: 'environment'};
-  private static DEFAULT_IMAGE_TYPE: string = 'image/jpeg';
+  private static DEFAULT_VIDEO_OPTIONS: MediaTrackConstraints = {
+    facingMode: "environment",
+  };
+  private static DEFAULT_IMAGE_TYPE: string = "image/jpeg";
   private static DEFAULT_IMAGE_QUALITY: number = 0.92;
 
   /** Defines the max width of the webcam area in px */
@@ -20,7 +30,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /** Defines the max height of the webcam area in px */
   @Input() public height: number = 480;
   /** Defines base constraints to apply when requesting video track from UserMedia */
-  @Input() public videoOptions: MediaTrackConstraints = WebcamComponent.DEFAULT_VIDEO_OPTIONS;
+  @Input() public videoOptions: MediaTrackConstraints =
+    WebcamComponent.DEFAULT_VIDEO_OPTIONS;
   /** Flag to enable/disable camera switch. If enabled, a switch icon will be displayed if multiple cameras were found */
   @Input() public allowCameraSwitch: boolean = true;
   /** Parameter to control image mirroring (i.e. for user-facing camera). ["auto", "always", "never"] */
@@ -33,13 +44,23 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Input() public imageQuality: number = WebcamComponent.DEFAULT_IMAGE_QUALITY;
 
   /** EventEmitter which fires when an image has been captured */
-  @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<WebcamImage>();
+  @Output() public imageCapture: EventEmitter<WebcamImage> = new EventEmitter<
+    WebcamImage
+  >();
   /** Emits a mediaError if webcam cannot be initialized (e.g. missing user permissions) */
-  @Output() public initError: EventEmitter<WebcamInitError> = new EventEmitter<WebcamInitError>();
+  @Output() public initError: EventEmitter<WebcamInitError> = new EventEmitter<
+    WebcamInitError
+  >();
+  /** Emits when the user accepts permissions */
+  @Output() public initSuccess: EventEmitter<Boolean> = new EventEmitter<
+    Boolean
+  >();
   /** Emits when the webcam video was clicked */
   @Output() public imageClick: EventEmitter<void> = new EventEmitter<void>();
   /** Emits the active deviceId after the active video device was switched */
-  @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<string>();
+  @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<
+    string
+  >();
 
   /** available video devices */
   public availableVideoInputs: MediaDeviceInfo[] = [];
@@ -56,9 +77,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private switchCameraSubscription: Subscription;
   /** MediaStream object in use for streaming UserMedia data */
   private mediaStream: MediaStream = null;
-  @ViewChild('video', { static: true }) private video: any;
+  @ViewChild("video", { static: true }) private video: any;
   /** Canvas for Video Snapshots */
-  @ViewChild('canvas', { static: true }) private canvas: any;
+  @ViewChild("canvas", { static: true }) private canvas: any;
 
   /** width and height of the active video stream */
   private activeVideoSettings: MediaTrackSettings = null;
@@ -92,15 +113,17 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     }
 
     // Subscribe to events from this Observable to switch video device
-    this.switchCameraSubscription = switchCamera.subscribe((value: boolean | string) => {
-      if (typeof value === 'string') {
-        // deviceId was specified
-        this.switchToVideoInput(value);
-      } else {
-        // direction was specified
-        this.rotateVideoInput(value !== false);
+    this.switchCameraSubscription = switchCamera.subscribe(
+      (value: boolean | string) => {
+        if (typeof value === "string") {
+          // deviceId was specified
+          this.switchToVideoInput(value);
+        } else {
+          // direction was specified
+          this.rotateVideoInput(value !== false);
+        }
       }
-    });
+    );
   }
 
   /**
@@ -109,10 +132,15 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * @param baseMediaTrackConstraints base constraints to merge deviceId-constraint into
    * @returns
    */
-  private static getMediaConstraintsForDevice(deviceId: string, baseMediaTrackConstraints: MediaTrackConstraints): MediaTrackConstraints {
-    const result: MediaTrackConstraints = baseMediaTrackConstraints ? baseMediaTrackConstraints : this.DEFAULT_VIDEO_OPTIONS;
+  private static getMediaConstraintsForDevice(
+    deviceId: string,
+    baseMediaTrackConstraints: MediaTrackConstraints
+  ): MediaTrackConstraints {
+    const result: MediaTrackConstraints = baseMediaTrackConstraints
+      ? baseMediaTrackConstraints
+      : this.DEFAULT_VIDEO_OPTIONS;
     if (deviceId) {
-      result.deviceId = {exact: deviceId};
+      result.deviceId = { exact: deviceId };
     }
 
     return result;
@@ -125,11 +153,22 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * @param mediaStreamTrack
    * @returns deviceId if found in the mediaStreamTrack
    */
-  private static getDeviceIdFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
-    if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().deviceId) {
+  private static getDeviceIdFromMediaStreamTrack(
+    mediaStreamTrack: MediaStreamTrack
+  ): string {
+    if (
+      mediaStreamTrack.getSettings &&
+      mediaStreamTrack.getSettings() &&
+      mediaStreamTrack.getSettings().deviceId
+    ) {
       return mediaStreamTrack.getSettings().deviceId;
-    } else if (mediaStreamTrack.getConstraints && mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().deviceId) {
-      const deviceIdObj: ConstrainDOMString = mediaStreamTrack.getConstraints().deviceId;
+    } else if (
+      mediaStreamTrack.getConstraints &&
+      mediaStreamTrack.getConstraints() &&
+      mediaStreamTrack.getConstraints().deviceId
+    ) {
+      const deviceIdObj: ConstrainDOMString = mediaStreamTrack.getConstraints()
+        .deviceId;
       return WebcamComponent.getValueFromConstrainDOMString(deviceIdObj);
     }
   }
@@ -141,13 +180,26 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * @param mediaStreamTrack
    * @returns facingMode if found in the mediaStreamTrack
    */
-  private static getFacingModeFromMediaStreamTrack(mediaStreamTrack: MediaStreamTrack): string {
+  private static getFacingModeFromMediaStreamTrack(
+    mediaStreamTrack: MediaStreamTrack
+  ): string {
     if (mediaStreamTrack) {
-      if (mediaStreamTrack.getSettings && mediaStreamTrack.getSettings() && mediaStreamTrack.getSettings().facingMode) {
+      if (
+        mediaStreamTrack.getSettings &&
+        mediaStreamTrack.getSettings() &&
+        mediaStreamTrack.getSettings().facingMode
+      ) {
         return mediaStreamTrack.getSettings().facingMode;
-      } else if (mediaStreamTrack.getConstraints && mediaStreamTrack.getConstraints() && mediaStreamTrack.getConstraints().facingMode) {
-        const facingModeConstraint: ConstrainDOMString = mediaStreamTrack.getConstraints().facingMode;
-        return WebcamComponent.getValueFromConstrainDOMString(facingModeConstraint);
+      } else if (
+        mediaStreamTrack.getConstraints &&
+        mediaStreamTrack.getConstraints() &&
+        mediaStreamTrack.getConstraints().facingMode
+      ) {
+        const facingModeConstraint: ConstrainDOMString = mediaStreamTrack.getConstraints()
+          .facingMode;
+        return WebcamComponent.getValueFromConstrainDOMString(
+          facingModeConstraint
+        );
       }
     }
   }
@@ -157,25 +209,32 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * @param mediaStreamTrack
    */
   private static isUserFacing(mediaStreamTrack: MediaStreamTrack): boolean {
-    const facingMode: string = WebcamComponent.getFacingModeFromMediaStreamTrack(mediaStreamTrack);
-    return facingMode ? 'user' === facingMode.toLowerCase() : false;
+    const facingMode: string = WebcamComponent.getFacingModeFromMediaStreamTrack(
+      mediaStreamTrack
+    );
+    return facingMode ? "user" === facingMode.toLowerCase() : false;
   }
 
   /**
    * Extracts the value from the given ConstrainDOMString
    * @param constrainDOMString
    */
-  private static getValueFromConstrainDOMString(constrainDOMString: ConstrainDOMString): string {
+  private static getValueFromConstrainDOMString(
+    constrainDOMString: ConstrainDOMString
+  ): string {
     if (constrainDOMString) {
       if (constrainDOMString instanceof String) {
         return String(constrainDOMString);
-      } else if (Array.isArray(constrainDOMString) && Array(constrainDOMString).length > 0) {
+      } else if (
+        Array.isArray(constrainDOMString) &&
+        Array(constrainDOMString).length > 0
+      ) {
         return String(constrainDOMString[0]);
-      } else if (typeof constrainDOMString === 'object') {
-        if (constrainDOMString['exact']) {
-          return String(constrainDOMString['exact']);
-        } else if (constrainDOMString['ideal']) {
-          return String(constrainDOMString['ideal']);
+      } else if (typeof constrainDOMString === "object") {
+        if (constrainDOMString["exact"]) {
+          return String(constrainDOMString["exact"]);
+        } else if (constrainDOMString["ideal"]) {
+          return String(constrainDOMString["ideal"]);
         }
       }
     }
@@ -190,7 +249,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
         this.switchToVideoInput(null);
       })
       .catch((err: string) => {
-        this.initError.next(<WebcamInitError>{message: err});
+        this.initError.next(<WebcamInitError>{ message: err });
         // fallback: still try to load webcam, even if device enumeration failed
         this.switchToVideoInput(null);
       });
@@ -207,7 +266,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   public takeSnapshot(): void {
     // set canvas size to actual video size
     const _video = this.nativeVideoElement;
-    const dimensions = {width: this.width, height: this.height};
+    const dimensions = { width: this.width, height: this.height };
     if (_video.videoWidth) {
       dimensions.width = _video.videoWidth;
       dimensions.height = _video.videoHeight;
@@ -218,12 +277,16 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     _canvas.height = dimensions.height;
 
     // paint snapshot image to canvas
-    const context2d = _canvas.getContext('2d');
+    const context2d = _canvas.getContext("2d");
     context2d.drawImage(_video, 0, 0);
 
     // read canvas content as image
-    const mimeType: string = this.imageType ? this.imageType : WebcamComponent.DEFAULT_IMAGE_TYPE;
-    const quality: number = this.imageQuality ? this.imageQuality : WebcamComponent.DEFAULT_IMAGE_QUALITY;
+    const mimeType: string = this.imageType
+      ? this.imageType
+      : WebcamComponent.DEFAULT_IMAGE_TYPE;
+    const quality: number = this.imageQuality
+      ? this.imageQuality
+      : WebcamComponent.DEFAULT_IMAGE_QUALITY;
     const dataUrl: string = _canvas.toDataURL(mimeType, quality);
 
     // get the ImageData object from the canvas' context.
@@ -242,9 +305,15 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    */
   public rotateVideoInput(forward: boolean) {
     if (this.availableVideoInputs && this.availableVideoInputs.length > 1) {
-      const increment: number = forward ? 1 : (this.availableVideoInputs.length - 1);
-      const nextInputIndex = (this.activeVideoInputIndex + increment) % this.availableVideoInputs.length;
-      this.switchToVideoInput(this.availableVideoInputs[nextInputIndex].deviceId);
+      const increment: number = forward
+        ? 1
+        : this.availableVideoInputs.length - 1;
+      const nextInputIndex =
+        (this.activeVideoInputIndex + increment) %
+        this.availableVideoInputs.length;
+      this.switchToVideoInput(
+        this.availableVideoInputs[nextInputIndex].deviceId
+      );
     }
   }
 
@@ -256,7 +325,6 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     this.stopMediaTracks();
     this.initWebcam(deviceId, this.videoOptions);
   }
-
 
   /**
    * Event-handler for video resize event.
@@ -277,10 +345,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   }
 
   public get videoStyleClasses() {
-    let classes: string = '';
+    let classes: string = "";
 
     if (this.isMirrorImage()) {
-      classes += 'mirrored ';
+      classes += "mirrored ";
     }
 
     return classes.trim();
@@ -296,9 +364,12 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private getVideoAspectRatio(): number {
     // calculate ratio from video element dimensions if present
     const videoElement = this.nativeVideoElement;
-    if (videoElement.videoWidth && videoElement.videoWidth > 0 &&
-      videoElement.videoHeight && videoElement.videoHeight > 0) {
-
+    if (
+      videoElement.videoWidth &&
+      videoElement.videoWidth > 0 &&
+      videoElement.videoHeight &&
+      videoElement.videoHeight > 0
+    ) {
       return videoElement.videoWidth / videoElement.videoHeight;
     }
 
@@ -309,21 +380,29 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /**
    * Init webcam live view
    */
-  private initWebcam(deviceId: string, userVideoTrackConstraints: MediaTrackConstraints) {
+  private initWebcam(
+    deviceId: string,
+    userVideoTrackConstraints: MediaTrackConstraints
+  ) {
     const _video = this.nativeVideoElement;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-
       // merge deviceId -> userVideoTrackConstraints
-      const videoTrackConstraints = WebcamComponent.getMediaConstraintsForDevice(deviceId, userVideoTrackConstraints);
+      const videoTrackConstraints = WebcamComponent.getMediaConstraintsForDevice(
+        deviceId,
+        userVideoTrackConstraints
+      );
 
-      navigator.mediaDevices.getUserMedia(<MediaStreamConstraints>{video: videoTrackConstraints})
+      navigator.mediaDevices
+        .getUserMedia(<MediaStreamConstraints>{ video: videoTrackConstraints })
         .then((stream: MediaStream) => {
           this.mediaStream = stream;
           _video.srcObject = stream;
           _video.play();
 
           this.activeVideoSettings = stream.getVideoTracks()[0].getSettings();
-          const activeDeviceId: string = WebcamComponent.getDeviceIdFromMediaStreamTrack(stream.getVideoTracks()[0]);
+          const activeDeviceId: string = WebcamComponent.getDeviceIdFromMediaStreamTrack(
+            stream.getVideoTracks()[0]
+          );
 
           this.cameraSwitched.next(activeDeviceId);
 
@@ -331,20 +410,31 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
           // Run detect once again within getUserMedia callback, to make sure this time we have permissions and get deviceIds.
           this.detectAvailableDevices()
             .then(() => {
-              this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
-                .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
+              this.activeVideoInputIndex = activeDeviceId
+                ? this.availableVideoInputs.findIndex(
+                    (mediaDeviceInfo: MediaDeviceInfo) =>
+                      mediaDeviceInfo.deviceId === activeDeviceId
+                  )
+                : -1;
               this.videoInitialized = true;
+              this.initSuccess.next(true);
             })
             .catch(() => {
               this.activeVideoInputIndex = -1;
               this.videoInitialized = true;
+              this.initSuccess.next(false);
             });
         })
         .catch((err: MediaStreamError) => {
-          this.initError.next(<WebcamInitError>{message: err.message, mediaStreamError: err});
+          this.initError.next(<WebcamInitError>{
+            message: err.message,
+            mediaStreamError: err,
+          });
         });
     } else {
-      this.initError.next(<WebcamInitError>{message: 'Cannot read UserMedia from MediaDevices.'});
+      this.initError.next(<WebcamInitError>{
+        message: "Cannot read UserMedia from MediaDevices.",
+      });
     }
   }
 
@@ -359,9 +449,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
     // check for explicit mirror override parameter
     {
-      let mirror: string = 'auto';
+      let mirror: string = "auto";
       if (this.mirrorImage) {
-        if (typeof this.mirrorImage === 'string') {
+        if (typeof this.mirrorImage === "string") {
           mirror = String(this.mirrorImage).toLowerCase();
         } else {
           // WebcamMirrorProperties
@@ -372,9 +462,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
       }
 
       switch (mirror) {
-        case 'always':
+        case "always":
           return true;
-        case 'never':
+        case "never":
           return false;
       }
     }
@@ -391,7 +481,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private stopMediaTracks() {
     if (this.mediaStream && this.mediaStream.getTracks) {
       // getTracks() returns all media tracks (video+audio)
-      this.mediaStream.getTracks()
+      this.mediaStream
+        .getTracks()
         .forEach((track: MediaStreamTrack) => track.stop());
     }
   }
@@ -418,11 +509,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
           this.availableVideoInputs = devices;
           resolve(devices);
         })
-        .catch(err => {
+        .catch((err) => {
           this.availableVideoInputs = [];
           reject(err);
         });
     });
   }
-
 }
