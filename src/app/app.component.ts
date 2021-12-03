@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
   public multipleWebcamsAvailable = false;
   public deviceId: string;
   public facingMode: string = 'environment';
-  public errors: WebcamInitError[] = [];
+  public messages: any[] = [];
 
   // latest snapshot
   public webcamImage: WebcamImage = null;
@@ -27,10 +27,7 @@ export class AppComponent implements OnInit {
   private nextWebcam: Subject<boolean|string> = new Subject<boolean|string>();
 
   public ngOnInit(): void {
-    WebcamUtil.getAvailableVideoInputs()
-      .then((mediaDevices: MediaDeviceInfo[]) => {
-        this.multipleWebcamsAvailable = mediaDevices && mediaDevices.length > 1;
-      });
+    this.readAvailableVideoInputs();
   }
 
   public triggerSnapshot(): void {
@@ -42,10 +39,10 @@ export class AppComponent implements OnInit {
   }
 
   public handleInitError(error: WebcamInitError): void {
+    this.messages.push(error);
     if (error.mediaStreamError && error.mediaStreamError.name === 'NotAllowedError') {
-      console.warn('Camera access was not allowed by user!');
+      this.addMessage('User denied camera access');
     }
-    this.errors.push(error);
   }
 
   public showNextWebcam(directionOrDeviceId: boolean|string): void {
@@ -56,13 +53,20 @@ export class AppComponent implements OnInit {
   }
 
   public handleImage(webcamImage: WebcamImage): void {
-    console.log('received webcam image', webcamImage);
+    this.addMessage('Received webcam image');
+    console.log(webcamImage);
     this.webcamImage = webcamImage;
   }
 
   public cameraWasSwitched(deviceId: string): void {
-    console.log('active device: ' + deviceId);
+    this.addMessage('Active device: ' + deviceId);
     this.deviceId = deviceId;
+    this.readAvailableVideoInputs();
+  }
+
+  addMessage(message: any): void {
+    console.log(message);
+    this.messages.unshift(message);
   }
 
   public get triggerObservable(): Observable<void> {
@@ -80,5 +84,12 @@ export class AppComponent implements OnInit {
     }
 
     return result;
+  }
+
+  private readAvailableVideoInputs() {
+    WebcamUtil.getAvailableVideoInputs()
+      .then((mediaDevices: MediaDeviceInfo[]) => {
+        this.multipleWebcamsAvailable = mediaDevices && mediaDevices.length > 1;
+      });
   }
 }

@@ -1,6 +1,6 @@
 <div style="text-align:center">
   <h1>
-    Ngx-Webcam Demo
+    ngx-webcam Demo
   </h1>
 
   <div>
@@ -11,16 +11,16 @@
             (cameraSwitched)="cameraWasSwitched($event)"
             (initError)="handleInitError($event)"
     ></webcam>
-    <br/>
+    <br>
     <button class="actionBtn" (click)="triggerSnapshot();">Take A Snapshot</button>
     <button class="actionBtn" (click)="toggleWebcam();">Toggle Webcam</button>
-    <br/>
+    <br>
     <button class="actionBtn" (click)="showNextWebcam(true);" [disabled]="!multipleWebcamsAvailable">Next Webcam</button>
     <input id="cameraSwitchCheckbox" type="checkbox" [(ngModel)]="allowCameraSwitch"><label for="cameraSwitchCheckbox">Allow Camera Switch</label>
-    <br/>
+    <br>
     DeviceId: <input id="deviceId" type="text" [(ngModel)]="deviceId" style="width: 500px">
     <button (click)="showNextWebcam(deviceId);">Activate</button>
-    <br/>
+    <br>
     Preferred facing mode:
     <input type="radio" value="user" name="facingMode" [(ngModel)]="facingMode"> User
     <input type="radio" value="environment" name="facingMode" [(ngModel)]="facingMode"> Environment
@@ -30,18 +30,18 @@
 
 <div class="snapshot" *ngIf="webcamImage">
   <h2>Nice one!</h2>
-  <img [src]="webcamImage.imageAsDataUrl"/>
+  <img [src]="webcamImage.imageAsDataUrl" alt="webcam image">
 </div>
 
-<h4 *ngIf="errors.length > 0">Messages:</h4>
-<ul *ngFor="let error of errors">
-  <li>{{error | json}}</li>
+<h4 *ngIf="messages.length > 0">Messages:</h4>
+<ul *ngFor="let msg of messages">
+  <li>{{msg | json}}</li>
 </ul>
 
 <h2>Like this project on GitHub:</h2>
 <ul class="links">
   <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/basst314/ngx-webcam">Ngx-Webcam / GitHub</a></h2>
+    <h2><a target="_blank" rel="noopener" href="https://github.com/basst314/ngx-webcam">ngx-webcam / GitHub</a></h2>
   </li>
 </ul>
 
