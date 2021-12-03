@@ -24,6 +24,6 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Ngx-Webcam Demo');
+    expect(compiled.querySelector('h1').textContent).toContain('ngx-webcam Demo');
   }));
 });
