@@ -391,8 +391,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private stopMediaTracks() {
     if (this.mediaStream && this.mediaStream.getTracks) {
       // pause video to prevent mobile browser freezes
-      this.video.nativeElement.pause();
-      
+      this.nativeVideoElement.pause();
+
       // getTracks() returns all media tracks (video+audio)
       this.mediaStream.getTracks()
         .forEach((track: MediaStreamTrack) => track.stop());
