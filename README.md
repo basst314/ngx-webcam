@@ -59,7 +59,7 @@ export class AppModule { }
 
 `<webcam></webcam>`
 
-As simple as that. 
+As simple as that.
 
 For more examples, see the code in the <a href="https://github.com/basst314/ngx-webcam-demo" target="_blank">Demo-Project</a>.
 
@@ -82,17 +82,43 @@ This section describes the basic inputs/outputs of the component. All inputs are
 * `imageClick: EventEmitter<void>`: An `EventEmitter` to signal clicks on the webcam area.
 * `initError: EventEmitter<WebcamInitError>`: An `EventEmitter` to signal errors during the webcam initialization.
 * `cameraSwitched: EventEmitter<string>`: Emits the active deviceId after the active video device has been switched.
+* `videoDeviceInfo: EventEmitter<InputDeviceInfo>`: Emits information on the device when it changes. Helpful to be able to run `getCapabilities()` to view device properties [MediaTrackCapabilities](https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamTrack/getCapabilities).
+
+``` typescript
+interface MediaTrackCapabilities {
+  aspectRatio?: DoubleRange;
+  autoGainControl?: boolean[];
+  channelCount?: ULongRange;
+  deviceId?: string;
+  echoCancellation?: boolean[];
+  facingMode?: string[];
+  frameRate?: DoubleRange;
+  groupId?: string;
+  height?: ULongRange;
+  latency?: DoubleRange;
+  noiseSuppression?: boolean[];
+  resizeMode?: string[];
+  sampleRate?: ULongRange;
+  sampleSize?: ULongRange;
+  width?: ULongRange;
+}
+```
 
 ## Good To Know
+
 ### How to determine if a user has denied camera access
+
 When camera initialization fails for some reason, the component emits a `WebcamInitError` via the `initError` EventEmitter. If provided by the browser, this object contains a field `mediaStreamError: MediaStreamError` which contains information about why UserMedia initialization failed. According to [Mozilla API docs](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia), this object contains a `name` attribute which gives insight about the reason.
+
 > If the user denies permission, or matching media is not available, then the promise is rejected with NotAllowedError or NotFoundError respectively.
 
 Determine if a user has denied permissions:
-```
+
+``` html
   <webcam (initError)="handleInitError($event)"></webcam>
 ```
-```
+
+``` typescript
   public handleInitError(error: WebcamInitError): void {
     if (error.mediaStreamError && error.mediaStreamError.name === "NotAllowedError") {
       console.warn("Camera access was not allowed by user!");

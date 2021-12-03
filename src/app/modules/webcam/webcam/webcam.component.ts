@@ -40,9 +40,11 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Output() public imageClick: EventEmitter<void> = new EventEmitter<void>();
   /** Emits the active deviceId after the active video device was switched */
   @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<string>();
+  /** Emits device info of the active device to get kind, label, and MediaTrackCapabilities of the device **/
+  @Output() public videoDeviceInfo: EventEmitter<InputDeviceInfo> = new EventEmitter();
 
   /** available video devices */
-  public availableVideoInputs: MediaDeviceInfo[] = [];
+  public availableVideoInputs: InputDeviceInfo[] = [];
 
   /** Indicates whether the video device is ready to be switched */
   public videoInitialized: boolean = false;
@@ -334,10 +336,12 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
               this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
                 .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
               this.videoInitialized = true;
+              this.videoDeviceInfo.next(this.availableVideoInputs[this.activeVideoInputIndex]);
             })
             .catch(() => {
               this.activeVideoInputIndex = -1;
               this.videoInitialized = true;
+              this.videoDeviceInfo.next(undefined);
             });
         })
         .catch((err: DOMException) => {
@@ -414,10 +418,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /**
    * Reads available input devices
    */
-  private detectAvailableDevices(): Promise<MediaDeviceInfo[]> {
+  private detectAvailableDevices(): Promise<InputDeviceInfo[]> {
     return new Promise((resolve, reject) => {
       WebcamUtil.getAvailableVideoInputs()
-        .then((devices: MediaDeviceInfo[]) => {
+        .then((devices: InputDeviceInfo[]) => {
           this.availableVideoInputs = devices;
           resolve(devices);
         })
