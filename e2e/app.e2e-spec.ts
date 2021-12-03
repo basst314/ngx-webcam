@@ -9,6 +9,6 @@ describe('ngx-webcam App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('Ngx-Webcam Demo');
+    expect(page.getParagraphText()).toEqual('ngx-webcam Demo');
   });
 });
