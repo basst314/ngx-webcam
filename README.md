@@ -3,7 +3,7 @@
 A simple Angular webcam component. Pure &amp; minimal, no
 Flash-fallback. <a href="https://basst314.github.io/ngx-webcam/?" target="_blank">See the Demo!</a>
 
-**Plug-and-play.** This library contains a single module which can be imported into every standard Angular 9+ project.
+**Plug-and-play.** This library contains a single module which can be imported into every standard Angular 13+ project.
 
 **Simple to use.** The one component gives you full control and lets you take snapshots via actions and event bindings.
 
