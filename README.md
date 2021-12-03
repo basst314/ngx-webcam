@@ -29,12 +29,11 @@ the <a href="https://github.com/basst314/ngx-webcam-demo" target="_blank">Demo-P
 
 ### Runtime Dependencies
 
-**Note:** Starting from version `0.3.0` this project requires TypeScript `>= 3.7.0` (Angular 9). For older versions of
-Angular/TypeScript, please use version `0.2.6` of this library.
+**Note:** For older versions of Angular/TypeScript, please use previous releases of this library.
 
-- Angular: `>=9.0.0`
-- Typescript: `>=3.7.0`
-- RxJs: `>=5.0.0`
+- Angular: `>=13.0.0`
+- Typescript: `>=4.4.4`
+- RxJs: `>=6.6.0`
 - **Important:** Your app must be served on a secure context using `https://` or on localhost, for modern browsers to
   permit WebRTC/UserMedia access.
 
