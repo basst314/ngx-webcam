@@ -340,7 +340,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
               this.videoInitialized = true;
             });
         })
-        .catch((err: MediaStreamError) => {
+        .catch((err: DOMException) => {
           this.initError.next(<WebcamInitError>{message: err.message, mediaStreamError: err});
         });
     } else {
