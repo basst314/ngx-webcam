@@ -56,9 +56,9 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   private switchCameraSubscription: Subscription;
   /** MediaStream object in use for streaming UserMedia data */
   private mediaStream: MediaStream = null;
-  @ViewChild('video', { static: true }) private video: any;
+  @ViewChild('video', {static: true}) private video: any;
   /** Canvas for Video Snapshots */
-  @ViewChild('canvas', { static: true }) private canvas: any;
+  @ViewChild('canvas', {static: true}) private canvas: any;
 
   /** width and height of the active video stream */
   private activeVideoSettings: MediaTrackSettings = null;
@@ -183,17 +183,13 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     return null;
   }
 
-  public ngAfterViewInit(): void {
-    this.detectAvailableDevices()
-      .then(() => {
-        // start video
-        this.switchToVideoInput(null);
-      })
-      .catch((err: string) => {
-        this.initError.next(<WebcamInitError>{message: err});
-        // fallback: still try to load webcam, even if device enumeration failed
-        this.switchToVideoInput(null);
-      });
+  public async ngAfterViewInit() {
+    try {
+      await this.detectAvailableDevices();
+    } catch (e) {
+      this.initError.next(<WebcamInitError>{message: e.message});
+    }
+    this.switchToVideoInput(null);
   }
 
   public ngOnDestroy(): void {
@@ -317,7 +313,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
       const videoTrackConstraints = WebcamComponent.getMediaConstraintsForDevice(deviceId, userVideoTrackConstraints);
 
       navigator.mediaDevices.getUserMedia(<MediaStreamConstraints>{video: videoTrackConstraints})
-        .then((stream: MediaStream) => {
+        .then(async (stream: MediaStream) => {
           this.mediaStream = stream;
           _video.srcObject = stream;
           _video.play();
@@ -329,16 +325,11 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
           // Initial detect may run before user gave permissions, returning no deviceIds. This prevents later camera switches. (#47)
           // Run detect once again within getUserMedia callback, to make sure this time we have permissions and get deviceIds.
-          this.detectAvailableDevices()
-            .then(() => {
-              this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
-                .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
-              this.videoInitialized = true;
-            })
-            .catch(() => {
-              this.activeVideoInputIndex = -1;
-              this.videoInitialized = true;
-            });
+          await this.detectAvailableDevices();
+
+          this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
+            .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
+          this.videoInitialized = true;
         })
         .catch((err: DOMException) => {
           this.initError.next(<WebcamInitError>{message: err.message, mediaStreamError: err});
@@ -414,18 +405,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /**
    * Reads available input devices
    */
-  private detectAvailableDevices(): Promise<MediaDeviceInfo[]> {
-    return new Promise((resolve, reject) => {
-      WebcamUtil.getAvailableVideoInputs()
-        .then((devices: MediaDeviceInfo[]) => {
-          this.availableVideoInputs = devices;
-          resolve(devices);
-        })
-        .catch(err => {
-          this.availableVideoInputs = [];
-          reject(err);
-        });
-    });
+  private async detectAvailableDevices(): Promise<void> {
+    this.availableVideoInputs = await WebcamUtil.getAvailableVideoInputs();
   }
 
 }
