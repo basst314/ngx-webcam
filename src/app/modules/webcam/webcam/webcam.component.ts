@@ -199,6 +199,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   public ngOnDestroy(): void {
     this.stopMediaTracks();
     this.unsubscribeFromSubscriptions();
+    this.mediaStream = null;
   }
 
   /**
@@ -395,7 +396,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
       // getTracks() returns all media tracks (video+audio)
       this.mediaStream.getTracks()
-        .forEach((track: MediaStreamTrack) => track.stop());
+        .forEach((track: MediaStreamTrack) => {
+          track.stop();
+          this.mediaStream.removeTrack(track);
+        });
     }
   }
 
