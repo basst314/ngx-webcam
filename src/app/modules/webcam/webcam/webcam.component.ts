@@ -62,6 +62,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
   /** width and height of the active video stream */
   private activeVideoSettings: MediaTrackSettings = null;
+  private promise: Promise<void>;
 
   /**
    * If the given Observable emits, an image will be captured and emitted through 'imageCapture' EventEmitter
@@ -316,7 +317,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
       // merge deviceId -> userVideoTrackConstraints
       const videoTrackConstraints = WebcamComponent.getMediaConstraintsForDevice(deviceId, userVideoTrackConstraints);
 
-      navigator.mediaDevices.getUserMedia(<MediaStreamConstraints>{video: videoTrackConstraints})
+      this.promise = navigator.mediaDevices.getUserMedia(<MediaStreamConstraints>{video: videoTrackConstraints})
         .then((stream: MediaStream) => {
           this.mediaStream = stream;
           _video.srcObject = stream;
@@ -329,7 +330,7 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
           // Initial detect may run before user gave permissions, returning no deviceIds. This prevents later camera switches. (#47)
           // Run detect once again within getUserMedia callback, to make sure this time we have permissions and get deviceIds.
-          this.detectAvailableDevices()
+          return this.detectAvailableDevices()
             .then(() => {
               this.activeVideoInputIndex = activeDeviceId ? this.availableVideoInputs
                 .findIndex((mediaDeviceInfo: MediaDeviceInfo) => mediaDeviceInfo.deviceId === activeDeviceId) : -1;
@@ -389,13 +390,22 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
    * even if it is no longer used by this component.
    */
   private stopMediaTracks() {
-    if (this.mediaStream && this.mediaStream.getTracks) {
-      // pause video to prevent mobile browser freezes
-      this.nativeVideoElement.pause();
 
-      // getTracks() returns all media tracks (video+audio)
-      this.mediaStream.getTracks()
-        .forEach((track: MediaStreamTrack) => track.stop());
+    if (this.promise !== undefined && this.promise !== null) {
+      this.promise.then(
+        () => {
+          if (this.mediaStream && this.mediaStream.getTracks) {
+            // pause video to prevent mobile browser freezes
+            this.nativeVideoElement.pause();
+          }
+          // getTracks() return all media tracks (video+audio)f
+          this.mediaStream.getTracks()
+            .forEach((track: MediaStreamTrack) => {
+              track.stop();
+              this.mediaStream.removeTrack(track);
+            })
+        }
+      )
     }
   }
 
