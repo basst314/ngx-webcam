@@ -36,6 +36,15 @@ export class AppComponent implements OnInit {
 
   public toggleWebcam(): void {
     this.showWebcam = !this.showWebcam;
+    if (!this.showWebcam) {
+      this.turnOffCamera();
+    }
+  }
+
+  public turnOffCamera(): void {
+    this.deviceId = null;
+    this.showWebcam = false;
+    this.nextWebcam.complete();
   }
 
   public handleInitError(error: WebcamInitError): void {
