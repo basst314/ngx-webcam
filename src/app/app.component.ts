@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
   public deviceId: string;
   public facingMode: string = 'environment';
   public messages: any[] = [];
+  public torchAvailable: boolean = false;
 
   // latest snapshot
   public webcamImage: WebcamImage = null;
@@ -25,6 +26,8 @@ export class AppComponent implements OnInit {
   private trigger: Subject<void> = new Subject<void>();
   // switch to next / previous / specific webcam; true/false: forward/backwards, string: deviceId
   private nextWebcam: Subject<boolean|string> = new Subject<boolean|string>();
+  // webcam torch trigger
+  private switchTorch: Subject<void> = new Subject<void>();
 
   public ngOnInit(): void {
     this.readAvailableVideoInputs();
@@ -91,5 +94,17 @@ export class AppComponent implements OnInit {
       .then((mediaDevices: MediaDeviceInfo[]) => {
         this.multipleWebcamsAvailable = mediaDevices && mediaDevices.length > 1;
       });
+  }
+
+  public switchingTorch(): void {
+    this.switchTorch.next();
+  }
+
+  public get switchTorchObservable(): Observable<void> {
+    return this.switchTorch.asObservable();
+  }
+
+  public torchIsAvailable($event: boolean) {
+    this.torchAvailable = $event;
   }
 }

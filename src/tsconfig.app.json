@@ -7,7 +7,8 @@
   },
   "files": [
     "main.ts",
-    "polyfills.ts"
+    "polyfills.ts",
+    "app/modules/webcam/typings/media-stream-track-ext.d.ts"
   ],
   "include": [
     "src/**/*.d.ts"
