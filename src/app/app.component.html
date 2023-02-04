@@ -10,10 +10,13 @@
             [imageQuality]="1"
             (cameraSwitched)="cameraWasSwitched($event)"
             (initError)="handleInitError($event)"
+            (torchAvailable)="torchIsAvailable($event)"
+            [switchTorch]="switchTorchObservable"
     ></webcam>
     <br>
     <button class="actionBtn" (click)="triggerSnapshot();">Take A Snapshot</button>
     <button class="actionBtn" (click)="toggleWebcam();">Toggle Webcam</button>
+    <button class="actionBtn" (click)="switchingTorch();" *ngIf="torchAvailable">Lantern</button>
     <br>
     <button class="actionBtn" (click)="showNextWebcam(true);" [disabled]="!multipleWebcamsAvailable">Next Webcam</button>
     <input id="cameraSwitchCheckbox" type="checkbox" [(ngModel)]="allowCameraSwitch"><label for="cameraSwitchCheckbox">Allow Camera Switch</label>

@@ -40,6 +40,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   @Output() public imageClick: EventEmitter<void> = new EventEmitter<void>();
   /** Emits the active deviceId after the active video device was switched */
   @Output() public cameraSwitched: EventEmitter<string> = new EventEmitter<string>();
+  /** Emits the capability torch deviceId after the active video device was switched */
+  @Output() public torchAvailable: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /** available video devices */
   public availableVideoInputs: MediaDeviceInfo[] = [];
@@ -50,6 +52,10 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
   /** If the Observable represented by this subscription emits, an image will be captured and emitted through
    * the 'imageCapture' EventEmitter */
   private triggerSubscription: Subscription;
+  /** Observable for Torch */
+  private switchTorchSubscription: Subscription;
+  /** Torch status On-Off */
+  private torchStatus: boolean = false;
   /** Index of active video in availableVideoInputs */
   private activeVideoInputIndex: number = -1;
   /** Subscription to switchCamera events */
@@ -100,6 +106,18 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
         // direction was specified
         this.rotateVideoInput(value !== false);
       }
+    });
+  }
+
+  @Input()
+  public set switchTorch(switchTorch: Observable<void>) {
+    if (this.switchTorchSubscription) {
+      this.switchTorchSubscription.unsubscribe();
+    }
+
+    // Subscribe to events from this Observable to take snapshots
+    this.switchTorchSubscription = switchTorch.subscribe(() => {
+      this.applyTorch();
     });
   }
 
@@ -306,6 +324,43 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
     return this.width / this.height;
   }
 
+
+  /**
+   *  'torch' is not on MediaStreamTrack interface?
+   *  Added a new definition for mediaStreamTrack
+   *  It works in:
+   *    Chromium browser's: running well
+   *    Firefox: don't work (feb-2022)
+   *    IOS: idk
+   */
+  private isTorchAvailable(mediaStreamTrack: MediaStreamTrackExt): boolean {
+    try {
+      return mediaStreamTrack.getCapabilities().torch;
+    } catch (e) {
+      console.error('Torch is not supported in your browser: ' + (e.message || e));
+    }
+    return false;
+  }
+
+  private applyTorch(): void {
+    const track = this.getActiveVideoTrack();
+    const constraints = {
+      advanced: [{torch: !this.torchStatus}]
+    };
+    if (this.isTorchAvailable(track)) {
+      track.applyConstraints(constraints)
+        .then(() => {
+          this.torchStatus = !this.torchStatus;
+          // return track;
+        })
+        .catch((e) => {
+          this.initError.next(<WebcamInitError>{message: e.message});
+        });
+    } else {
+      alert('Not Flash');
+    }
+  }
+
   /**
    * Init webcam live view
    */
@@ -324,6 +379,8 @@ export class WebcamComponent implements AfterViewInit, OnDestroy {
 
           this.activeVideoSettings = stream.getVideoTracks()[0].getSettings();
           const activeDeviceId: string = WebcamComponent.getDeviceIdFromMediaStreamTrack(stream.getVideoTracks()[0]);
+          // Initial detect torch funtion
+          this.torchAvailable.emit(this.isTorchAvailable(stream.getVideoTracks()[0]));
 
           this.cameraSwitched.next(activeDeviceId);
 
